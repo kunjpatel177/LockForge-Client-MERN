@@ -36,7 +36,7 @@ cp .env.example .env
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `VITE_API_URL` | `/api/v1` | API base path (proxied to the server in dev) |
+| `API_URL` | `/api/v1` | API base path (proxied to the server in dev) |
 
 In development, Vite proxies `/api` requests to `http://localhost:5000` — no extra config is required for local work.
 
