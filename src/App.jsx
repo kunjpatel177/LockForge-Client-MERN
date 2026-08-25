@@ -40,8 +40,8 @@ import ChangeMasterPassword from './pages/dashboard/ChangeMasterPassword';
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
           <ScrollToTop />
           <Routes>
             <Route element={<PublicLayout />}>
@@ -79,8 +79,8 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <ToastContainer position="top-right" autoClose={4000} theme="colored" />
-        </BrowserRouter>
-      </AuthProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
