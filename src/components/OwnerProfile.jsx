@@ -10,7 +10,7 @@ const OwnerProfile = () => {
     .map((part) => part[0])
     .join('')
     .toUpperCase()
-    .slice(0, 2);
+    .slice(0, 3);
 
   const detailFields = [
     // { key: 'role', icon: 'fa-briefcase', label: 'Role' },
