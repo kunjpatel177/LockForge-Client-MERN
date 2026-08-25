@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import AuthCTA from '../../components/AuthCTA';
 import { ownerInfo } from '../../config/owner';
+import { API_BASE_URL } from '../../config/api';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
@@ -12,7 +13,7 @@ const Home = () => {
 
   const handleGenerate = async () => {
     try {
-      const res = await fetch('/api/v1/public/generate-password', {
+      const res = await fetch(`${API_BASE_URL}/public/generate-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ length: 20, uppercase: true, lowercase: true, numbers: true, symbols: true }),

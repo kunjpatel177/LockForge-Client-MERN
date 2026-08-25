@@ -141,6 +141,18 @@ proxy: {
 
 Ensure the server is running before using auth or vault features.
 
+## Vercel Deployment
+
+1. Deploy the **server** project first (`server/` folder).
+2. In the **client** Vercel project, set environment variable:
+   ```
+   VITE_API_URL=/api/v1
+   ```
+3. Ensure `client/vercel.json` proxies `/api/*` to your deployed API URL.
+4. Redeploy the client after setting env vars (required for Vite builds).
+
+**Important:** Vite only reads variables prefixed with `VITE_`. Using `API_URL` without the prefix will not work in production.
+
 ## Related
 
 - [Server README](../server/README.md)

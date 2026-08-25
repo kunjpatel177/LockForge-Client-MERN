@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api.js';
 
 const TOKEN_KEY = 'lockforge_access_token';
 
@@ -14,7 +15,7 @@ export const setStoredToken = (token) => {
 };
 
 const api = axios.create({
-  baseURL: import.meta.env.API_URL || '/api/v1',
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
