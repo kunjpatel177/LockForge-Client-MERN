@@ -30,16 +30,16 @@ const PublicNavbar = () => {
               </li>
             ))}
           </ul>
-          <div className="d-flex align-items-center gap-2 mt-3 mt-lg-0">
-            <button className="btn btn-icon" onClick={toggleTheme} title="Toggle theme" type="button">
+          <div className="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 mt-3 mt-lg-0 navbar-mobile-actions">
+            <button className="btn btn-icon align-self-sm-center" onClick={toggleTheme} title="Toggle theme" type="button">
               <i className={`fas ${theme === 'light' ? 'fa-moon' : 'fa-sun'}`} />
             </button>
             {isAuthenticated ? (
-              <Link to="/dashboard" className="btn btn-primary btn-modern">Go to Dashboard</Link>
+              <Link to="/dashboard" className="btn btn-primary btn-modern w-100 w-sm-auto">Go to Dashboard</Link>
             ) : (
               <>
-                <Link to="/login" className="btn btn-ghost">Login</Link>
-                <Link to="/register" className="btn btn-primary btn-modern">Get Started</Link>
+                <Link to="/login" className="btn btn-ghost w-100 w-sm-auto">Login</Link>
+                <Link to="/register" className="btn btn-primary btn-modern w-100 w-sm-auto">Get Started</Link>
               </>
             )}
           </div>

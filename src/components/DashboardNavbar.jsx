@@ -78,6 +78,13 @@ const DashboardNavbar = ({ onToggleSidebar }) => {
             ))}
             <li className="d-lg-none"><Link className="dropdown-item" to="/dashboard">Dashboard</Link></li>
             <li className="d-lg-none"><hr className="dropdown-divider" /></li>
+            {vaultUnlocked && (
+              <li className="d-md-none">
+                <button type="button" className="dropdown-item" onClick={handleLock}>
+                  <i className="fas fa-lock me-2" />Lock Vault
+                </button>
+              </li>
+            )}
             <li><Link className="dropdown-item" to="/profile"><i className="fas fa-user me-2" />Profile</Link></li>
             <li><Link className="dropdown-item" to="/settings"><i className="fas fa-cog me-2" />Settings</Link></li>
             <li><hr className="dropdown-divider" /></li>
