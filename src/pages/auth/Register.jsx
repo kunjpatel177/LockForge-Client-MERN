@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { handleApiError } from '../../api/axios';
@@ -9,13 +9,16 @@ import BrandLogo from '../../components/BrandLogo';
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', masterPassword: '', confirmPassword: '', confirmMaster: '' });
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submittingRef.current) return;
     if (form.password !== form.confirmPassword) return toast.error('Passwords do not match');
     if (form.masterPassword !== form.confirmMaster) return toast.error('Master passwords do not match');
+    submittingRef.current = true;
     setLoading(true);
     try {
       await register({ name: form.name, email: form.email, password: form.password, masterPassword: form.masterPassword });
@@ -23,8 +26,9 @@ const Register = () => {
       navigate('/dashboard');
     } catch (err) {
       const { message } = handleApiError(err);
-      toast.error(message);
+      toast.error(message || err.message || 'Registration failed');
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };

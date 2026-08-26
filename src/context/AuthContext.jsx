@@ -139,8 +139,16 @@ export const AuthProvider = ({ children }) => {
   const register = async (data) => {
     authCheckRef.current += 1;
     const res = await authAPI.register(data);
-    setStoredToken(res.data.data.accessToken, res.data.data.refreshToken);
-    setUser(res.data.data.user);
+    const payload = res.data?.data;
+
+    if (!payload?.accessToken || !payload?.user) {
+      const err = new Error('Invalid registration response');
+      err.response = { data: { message: res.data?.message || 'Registration failed' } };
+      throw err;
+    }
+
+    setStoredToken(payload.accessToken, payload.refreshToken);
+    setUser(payload.user);
 
     try {
       await loadSessionData(authCheckRef.current);

@@ -130,7 +130,10 @@ api.interceptors.response.use(
 
 export const handleApiError = (error) => {
   const status = error.response?.status;
-  const message = error.response?.data?.message || 'Something went wrong';
+  const message = error.response?.data?.message
+    || (error.code === 'ERR_NETWORK' ? 'Network error. Please check your connection and try again.' : null)
+    || error.message
+    || 'Something went wrong';
   const isVaultLocked = status === 403 && isVaultLockedMessage(message);
   if (isVaultLocked) notifyVaultLocked();
   return { status, message: isVaultLocked ? null : message, isVaultLocked };
