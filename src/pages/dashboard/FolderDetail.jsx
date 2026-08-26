@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { folderAPI, vaultAPI, noteAPI } from '../../api';
-import { handleApiError } from '../../api/axios';
+import { showApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import VaultLockedState from '../../components/VaultLockedState';
@@ -41,7 +41,7 @@ const FolderDetail = () => {
       setCredentials(credRes.data.data);
       setNotes(noteRes.data.data);
     } catch (err) {
-      toast.error(handleApiError(err).message);
+      showApiError(err);
       navigate('/folders');
     } finally {
       setLoading(false);
@@ -81,7 +81,7 @@ const FolderDetail = () => {
       else await noteAPI.moveToFolder(itemId, null);
       toast.success('Removed from folder');
       load();
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
   };
 
   const handleNoteDelete = async (noteId) => {
@@ -99,7 +99,7 @@ const FolderDetail = () => {
       setViewNote(null);
       setEditingNote(null);
       load();
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
   };
 
   const startEditNote = (note) => {
@@ -122,7 +122,7 @@ const FolderDetail = () => {
       toast.success('Note updated');
       setEditingNote(null);
       load();
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
   };
 
   const copyToClipboard = (text, label) => {

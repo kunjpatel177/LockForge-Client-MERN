@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { securityAPI } from '../../api';
-import { handleApiError } from '../../api/axios';
+import { showApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
@@ -17,7 +17,7 @@ const SecurityDashboard = () => {
     if (!vaultUnlocked) { setLoading(false); return; }
     securityAPI.getDashboard()
       .then((r) => setData(r.data.data))
-      .catch((err) => toast.error(handleApiError(err).message))
+      .catch((err) => showApiError(err))
       .finally(() => setLoading(false));
   }, [vaultUnlocked]);
 

@@ -9,6 +9,7 @@ import {
   setStoredToken,
 } from '../api/axios';
 import { notifySessionEnded, registerSessionEndedHandler } from '../utils/sessionEvents';
+import { registerVaultLockedHandler } from '../utils/vaultEvents';
 
 const AuthContext = createContext(null);
 
@@ -33,6 +34,15 @@ export const AuthProvider = ({ children }) => {
     registerSessionEndedHandler(endSession);
     return () => registerSessionEndedHandler(null);
   }, [endSession]);
+
+  const handleVaultLocked = useCallback(() => {
+    setVaultUnlocked(false);
+  }, []);
+
+  useEffect(() => {
+    registerVaultLockedHandler(handleVaultLocked);
+    return () => registerVaultLockedHandler(null);
+  }, [handleVaultLocked]);
 
   const loadSessionData = useCallback(async (checkId) => {
     const [profileRes, vaultRes] = await Promise.all([
@@ -137,6 +147,15 @@ export const AuthProvider = ({ children }) => {
     setVaultUnlocked(false);
   };
 
+  const syncVaultStatus = useCallback(async () => {
+    try {
+      const vaultRes = await authAPI.vaultStatus();
+      setVaultUnlocked(!!vaultRes.data.data.unlocked);
+    } catch {
+      setVaultUnlocked(false);
+    }
+  }, []);
+
   const refreshProfile = async () => {
     const res = await userAPI.getProfile();
     setUser(res.data.data.user);
@@ -146,7 +165,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{
       user, stats, loading, vaultUnlocked, login, register, logout, endSession, destroyAuth,
-      unlockVault, lockVault, refreshProfile, checkAuth, isAuthenticated: !!user,
+      unlockVault, lockVault, syncVaultStatus, refreshProfile, checkAuth, isAuthenticated: !!user,
     }}>
       {children}
     </AuthContext.Provider>

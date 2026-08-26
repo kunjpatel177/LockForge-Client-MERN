@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { handleApiError } from '../api/axios';
+import { showApiError } from '../api/axios';
 import { toast } from 'react-toastify';
 import PasswordInput from './PasswordInput';
 
 const VaultUnlockModal = ({ show, onClose, onUnlock }) => {
-  const { unlockVault } = useAuth();
+  const { unlockVault, syncVaultStatus } = useAuth();
   const [masterPassword, setMasterPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -14,13 +14,13 @@ const VaultUnlockModal = ({ show, onClose, onUnlock }) => {
     setLoading(true);
     try {
       await unlockVault(masterPassword);
+      await syncVaultStatus();
       toast.success('Vault unlocked');
       setMasterPassword('');
       onUnlock?.();
       onClose?.();
     } catch (err) {
-      const { message } = handleApiError(err);
-      toast.error(message);
+      showApiError(err);
     } finally {
       setLoading(false);
     }

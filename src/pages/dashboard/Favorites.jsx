@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { vaultAPI, noteAPI } from '../../api';
-import { handleApiError } from '../../api/axios';
+import { showApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
@@ -27,7 +27,7 @@ const Favorites = () => {
         setCredentials(credRes.data.data);
         setNotes(noteRes.data.data);
       })
-      .catch((err) => toast.error(handleApiError(err).message))
+      .catch((err) => showApiError(err))
       .finally(() => setLoading(false));
   }, [vaultUnlocked]);
 

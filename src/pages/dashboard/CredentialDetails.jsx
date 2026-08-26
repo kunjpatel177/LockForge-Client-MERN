@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { vaultAPI } from '../../api';
-import { handleApiError } from '../../api/axios';
+import { showApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import VaultLockedState from '../../components/VaultLockedState';
@@ -20,7 +20,7 @@ const CredentialDetails = () => {
     if (!vaultUnlocked) { setLoading(false); return; }
     vaultAPI.getOne(id)
       .then((r) => setCred(r.data.data))
-      .catch((err) => toast.error(handleApiError(err).message))
+      .catch((err) => showApiError(err))
       .finally(() => setLoading(false));
   }, [id, vaultUnlocked]);
 
@@ -38,7 +38,7 @@ const CredentialDetails = () => {
       await vaultAPI.delete(id);
       toast.success('Moved to trash');
       navigate('/vault');
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
   };
 
   if (!vaultUnlocked) return <VaultLockedState />;

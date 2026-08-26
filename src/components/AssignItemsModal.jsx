@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { vaultAPI, noteAPI, folderAPI } from '../api';
-import { handleApiError } from '../api/axios';
+import { showApiError } from '../api/axios';
 import { toast } from 'react-toastify';
 
 const AssignItemsModal = ({ show, folderId, folderName, onClose, onAssigned }) => {
@@ -41,7 +41,7 @@ const AssignItemsModal = ({ show, folderId, folderName, onClose, onAssigned }) =
         setCredentials(credRes.data.data.filter((c) => String(c.folderId || '') !== String(folderId)));
         setNotes(noteRes.data.data.filter((n) => String(n.folderId || '') !== String(folderId)));
       } catch (err) {
-        toast.error(handleApiError(err).message);
+        showApiError(err);
         onClose?.();
       } finally {
         setLoading(false);
@@ -87,7 +87,7 @@ const AssignItemsModal = ({ show, folderId, folderName, onClose, onAssigned }) =
       await onAssigned?.({ credentialIds: selectedCreds, noteIds: selectedNotes });
       onClose?.();
     } catch (err) {
-      toast.error(handleApiError(err).message);
+      showApiError(err);
     } finally {
       setSaving(false);
     }

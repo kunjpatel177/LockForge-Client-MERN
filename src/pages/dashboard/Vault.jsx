@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { vaultAPI, folderAPI } from '../../api';
-import { handleApiError } from '../../api/axios';
+import { showApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
@@ -32,7 +32,7 @@ const Vault = () => {
       setCredentials(credRes.data.data);
       setFolders(folderRes.data.data);
     } catch (err) {
-      toast.error(handleApiError(err).message);
+      showApiError(err);
     } finally {
       setLoading(false);
     }
@@ -52,14 +52,14 @@ const Vault = () => {
       await vaultAPI.delete(id);
       toast.success('Moved to trash');
       load();
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
   };
 
   const handleFavorite = async (id) => {
     try {
       await vaultAPI.toggleFavorite(id);
       load();
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
   };
 
   const handleMove = async (folderId) => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { folderAPI } from '../api';
-import { handleApiError } from '../api/axios';
+import { showApiError } from '../api/axios';
 import { toast } from 'react-toastify';
 
 const MoveToFolderModal = ({
@@ -25,7 +25,7 @@ const MoveToFolderModal = ({
         const res = await folderAPI.getAll();
         setFolders(res.data.data.filter((f) => f.id !== currentFolderId));
       } catch (err) {
-        toast.error(handleApiError(err).message);
+        showApiError(err);
         onClose?.();
       } finally {
         setLoading(false);
@@ -41,7 +41,7 @@ const MoveToFolderModal = ({
       await onMove?.(targetFolderId || null);
       onClose?.();
     } catch (err) {
-      toast.error(handleApiError(err).message);
+      showApiError(err);
     } finally {
       setSaving(false);
     }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { noteAPI, folderAPI } from '../../api';
-import { handleApiError } from '../../api/axios';
+import { showApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
@@ -35,7 +35,7 @@ const SecureNotes = () => {
       ]);
       setNotes(noteRes.data.data);
       setFolders(folderRes.data.data);
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
     finally { setLoading(false); }
   };
 
@@ -79,7 +79,7 @@ const SecureNotes = () => {
       setEditing(null);
       setForm({ title: '', content: '', folderId: '', isFavorite: false });
       load();
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
   };
 
   const handleDelete = async (id) => {
@@ -94,7 +94,7 @@ const SecureNotes = () => {
       await noteAPI.delete(id);
       toast.success('Note deleted');
       load();
-    } catch (err) { toast.error(handleApiError(err).message); }
+    } catch (err) { showApiError(err); }
   };
 
   const handleMove = async (folderId) => {

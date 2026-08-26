@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../config/api.js';
 import { notifySessionEnded } from '../utils/sessionEvents.js';
+import { isVaultLockedMessage, notifyVaultLocked } from '../utils/vaultEvents.js';
 
 const TOKEN_KEY = 'lockforge_access_token';
 const REFRESH_TOKEN_KEY = 'lockforge_refresh_token';
@@ -118,6 +120,10 @@ api.interceptors.response.use(
       }
     }
 
+    if (error.response?.status === 403 && isVaultLockedMessage(error.response?.data?.message)) {
+      notifyVaultLocked();
+    }
+
     return Promise.reject(error);
   }
 );
@@ -125,7 +131,15 @@ api.interceptors.response.use(
 export const handleApiError = (error) => {
   const status = error.response?.status;
   const message = error.response?.data?.message || 'Something went wrong';
-  return { status, message };
+  const isVaultLocked = status === 403 && isVaultLockedMessage(message);
+  if (isVaultLocked) notifyVaultLocked();
+  return { status, message: isVaultLocked ? null : message, isVaultLocked };
+};
+
+export const showApiError = (error) => {
+  const result = handleApiError(error);
+  if (result.message) toast.error(result.message);
+  return result;
 };
 
 export default api;
