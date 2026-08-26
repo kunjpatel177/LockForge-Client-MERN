@@ -38,32 +38,35 @@ const Home = () => {
 
   const stats = [
     { value: 'AES-256', label: 'Military-grade encryption' },
-    { value: '0', label: 'Plaintext passwords stored' },
+    { value: '2FA', label: 'TOTP & email verification' },
     { value: '24/7', label: 'Vault access control' },
     { value: '100%', label: 'Encrypted at rest' },
   ];
 
   const features = [
-    { icon: 'fa-vault', title: 'Encrypted Vault', desc: 'Every credential is encrypted with AES-256-GCM before it ever touches the database.', color: 'indigo' },
-    { icon: 'fa-key', title: 'Smart Generator', desc: 'Create cryptographically strong passwords with customizable length and character sets.', color: 'violet' },
-    { icon: 'fa-folder-tree', title: 'Folders & Tags', desc: 'Organize credentials into folders like Work, Banking, and Social with flexible tagging.', color: 'cyan' },
-    { icon: 'fa-heart-pulse', title: 'Password Health', desc: 'Instantly detect weak, reused, and outdated passwords across your entire vault.', color: 'rose' },
-    { icon: 'fa-clock-rotate-left', title: 'Activity Logs', desc: 'Full audit trail of logins, changes, exports, and session events — without sensitive data.', color: 'amber' },
-    { icon: 'fa-cloud-arrow-up', title: 'Encrypted Backup', desc: 'Export and restore your vault with encrypted backups. Your data, your control.', color: 'emerald' },
+    { icon: 'fa-vault', title: 'Encrypted Vault', desc: 'Every credential is encrypted with AES-256-GCM before it ever touches the database. Unlock with your master password.', color: 'indigo' },
+    { icon: 'fa-mobile-screen-button', title: 'Two-Factor Auth', desc: 'Protect your account with authenticator app codes, email OTP, or both — enable and manage methods individually.', color: 'violet' },
+    { icon: 'fa-folder-tree', title: 'Folders & Organization', desc: 'Group credentials and notes in folders, move items in bulk, assign entries, and export folder-wise PDF reports.', color: 'cyan' },
+    { icon: 'fa-sticky-note', title: 'Secure Notes', desc: 'Store encrypted notes for recovery phrases, Wi-Fi details, and private memos — searchable from your vault.', color: 'rose' },
+    { icon: 'fa-heart-pulse', title: 'Password Health', desc: 'Security Dashboard scores your vault and flags weak, reused, and outdated passwords instantly.', color: 'amber' },
+    { icon: 'fa-cloud-arrow-up', title: 'Backup & PDF Export', desc: 'Export encrypted backups, restore your vault, or generate watermarked PDF exports with master password verification.', color: 'emerald' },
+    { icon: 'fa-desktop', title: 'Session Control', desc: 'View active devices, revoke sessions remotely, and keep vault keys bound to your login session.', color: 'indigo' },
+    { icon: 'fa-clock-rotate-left', title: 'Activity Logs', desc: 'Full audit trail of logins, credential changes, exports, email updates, and security events — no secrets logged.', color: 'violet' },
+    { icon: 'fa-trash-arrow-up', title: 'Trash & Recovery', desc: 'Soft-delete credentials with restore support. Empty trash only when you are ready to remove data permanently.', color: 'cyan' },
   ];
 
   const steps = [
-    { num: '01', title: 'Create your account', desc: 'Sign up with a strong account password and set your master password — the key to your vault.' },
-    { num: '02', title: 'Unlock your vault', desc: 'Your master password derives an encryption key via PBKDF2. Only you can decrypt your data.' },
-    { num: '03', title: 'Store & organize', desc: 'Add credentials, notes, and custom fields. Organize with folders, tags, and favorites.' },
-    { num: '04', title: 'Stay protected', desc: 'Monitor password health, review activity logs, and manage sessions across all devices.' },
+    { num: '01', title: 'Create your account', desc: 'Sign up with email verification, set a strong account password, and choose your master password — the key to your vault.' },
+    { num: '02', title: 'Secure & unlock', desc: 'Enable two-factor authentication, unlock your vault with PBKDF2-derived keys, and configure auto-lock in Settings.' },
+    { num: '03', title: 'Store & organize', desc: 'Add credentials, secure notes, and custom fields. Organize with folders, tags, favorites, and bulk move tools.' },
+    { num: '04', title: 'Monitor & protect', desc: 'Review password health, activity logs, and active sessions. Export backups or PDFs and update your email anytime.' },
   ];
 
   const faqs = [
     { q: 'Is my master password stored anywhere?', a: 'No. Only a cryptographic verifier is stored to validate unlock attempts. Your actual master password never leaves your session.' },
+    { q: 'What two-factor options are supported?', a: 'LockForge supports authenticator app (TOTP) codes and email OTP. You can enable one or both, and add or remove methods anytime from Settings.' },
     { q: 'What happens if I forget my master password?', a: 'Your master password cannot be recovered — by design. This ensures only you can access your encrypted vault.' },
-    { q: 'Is LockForge zero-knowledge?', a: 'LockForge uses server-side encryption. Your master password is never stored, but keys are derived server-side during vault unlock.' },
-    { q: 'Can I export my data?', a: 'Yes. Export encrypted backups or generate a PDF export (with master password re-verification) at any time.' },
+    { q: 'Can I export or change my email?', a: 'Yes. Export encrypted backups or watermarked PDFs from Backup & Restore. Change your registered email from Profile with password confirmation and a verification link.' },
   ];
 
   return (
@@ -81,8 +84,8 @@ const Home = () => {
                 <span className="gradient-text">Protected by design.</span>
               </h1>
               <p className="hero-subtitle">
-                LockForge encrypts every credential with AES-256-GCM, monitors password health,
-                and gives you complete control over your digital security — all in one beautiful vault.
+                LockForge encrypts every credential with AES-256-GCM, supports two-factor authentication,
+                monitors password health, and gives you folders, secure notes, backups, and session control — all in one vault.
               </p>
               <div className="d-flex gap-3 flex-wrap mb-4">
                 <AuthCTA
@@ -268,11 +271,15 @@ const Home = () => {
               <tbody>
                 {[
                   ['AES-256-GCM Encryption', true, false, false],
+                  ['Two-Factor Authentication', true, false, false],
                   ['Password Health Monitoring', true, false, false],
+                  ['Secure Notes & Custom Fields', true, false, false],
+                  ['Folder Organization & PDF Export', true, false, false],
                   ['Activity Audit Logs', true, false, false],
                   ['Encrypted Backup/Restore', true, false, false],
                   ['Session Management', true, false, false],
                   ['Master Password Protection', true, false, false],
+                  ['Trash & Credential Recovery', true, false, false],
                 ].map(([cap, lf, browser, plain]) => (
                   <tr key={cap}>
                     <td>{cap}</td>

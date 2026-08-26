@@ -16,15 +16,15 @@ const About = () => {
   const techStack = [
     { category: 'Frontend', items: ['React 19', 'Vite', 'React Router', 'Bootstrap 5', 'Axios'] },
     { category: 'Backend', items: ['Node.js', 'Express.js', 'Mongoose', 'JWT', 'Helmet'] },
-    { category: 'Security', items: ['AES-256-GCM', 'Argon2id', 'PBKDF2', 'Rate Limiting', 'CORS'] },
+    { category: 'Security', items: ['AES-256-GCM', 'Argon2id', 'PBKDF2', 'TOTP & Email 2FA', 'Rate Limiting'] },
     { category: 'Database', items: ['MongoDB', 'Indexed Queries', 'Encrypted Fields', 'Session Store', 'Activity Logs'] },
   ];
 
   const milestones = [
     { year: '2024', title: 'Concept & Architecture', desc: 'Security-first design with separated auth and vault encryption layers.' },
-    { year: '2025', title: 'Core Platform Launch', desc: 'Full vault management, folders, notes, password health, and backup/restore.' },
-    { year: '2026', title: 'LockForge 1.0', desc: 'Production-ready MERN application with session management, activity logs, and PDF export.' },
-    { year: 'Future', title: 'What\'s Next', desc: 'TOTP 2FA, browser extension, team vaults, and hardware key support.' },
+    { year: '2025', title: 'Core Platform Launch', desc: 'Full vault management, folders, secure notes, password health, backup/restore, and activity logging.' },
+    { year: '2026', title: 'LockForge 1.0', desc: 'Two-factor auth (TOTP + email), email change, folder assign/move, PDF export, session-bound vault keys, trash recovery, and production deployment.' },
+    { year: 'Future', title: 'What\'s Next', desc: 'Browser extension, team vaults, hardware key support, and mobile apps.' },
   ];
 
   return (
@@ -50,8 +50,9 @@ const About = () => {
               </p>
               <p className="text-muted mb-4">
                 We built LockForge as a complete MERN application demonstrating production-grade security
-                patterns: authenticated encryption, memory-hard hashing, session management, audit logging,
-                and encrypted backup — all wrapped in a modern, responsive interface.
+                patterns: authenticated encryption, memory-hard hashing, two-factor authentication,
+                session management, audit logging, encrypted backup, PDF export, and secure email change —
+                all wrapped in a modern, responsive interface.
               </p>
               <Link to="/security" className="btn btn-primary btn-modern">Explore Our Security</Link>
             </div>
@@ -66,8 +67,8 @@ const About = () => {
                   <div className="mission-stat-label">Plaintext secrets stored</div>
                 </div>
                 <div className="mission-stat">
-                  <div className="mission-stat-value">9+</div>
-                  <div className="mission-stat-label">Security layers</div>
+                  <div className="mission-stat-value">20+</div>
+                  <div className="mission-stat-label">Platform features</div>
                 </div>
                 <div className="mission-stat">
                   <div className="mission-stat-value">100%</div>
@@ -137,7 +138,8 @@ const About = () => {
               <p className="text-muted mb-3">
                 LockForge separates authentication data from encrypted vault data. Account passwords
                 (Argon2id hashed) and master password verifiers live in the User model. Encrypted
-                credentials, notes, and custom fields are stored as AES-256-GCM ciphertext blobs.
+                credentials, secure notes, and custom fields are stored as AES-256-GCM ciphertext blobs.
+                Two-factor secrets, session vault keys, and email change tokens are also stored securely.
               </p>
               <p className="text-muted">
                 API routes are versioned under <code>/api/v1</code> with controllers, middleware,

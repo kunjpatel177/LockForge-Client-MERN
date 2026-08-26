@@ -5,10 +5,11 @@ import AuthCTA from '../../components/AuthCTA';
 const UserGuide = () => {
   const quickStart = [
     { step: 1, title: 'Create your account', desc: 'Register with your email, set a strong account password, and choose a master password. Your master password encrypts your vault — store it safely.', icon: 'fa-user-plus' },
-    { step: 2, title: 'Verify your email', desc: 'Check your inbox for a verification link. Verifying your email helps secure account recovery and notifications.', icon: 'fa-envelope-circle-check' },
-    { step: 3, title: 'Unlock your vault', desc: 'After logging in, click "Unlock Vault" and enter your master password. Your vault stays unlocked until you lock it or your session expires.', icon: 'fa-unlock-keyhole' },
-    { step: 4, title: 'Add your first credential', desc: 'Go to Vault → Add Credential. Fill in the service name, username or email, password, and optionally assign a folder.', icon: 'fa-plus' },
-    { step: 5, title: 'Organize & monitor', desc: 'Use folders, favorites, and the Security Dashboard to keep credentials organized and check password health.', icon: 'fa-chart-line' },
+    { step: 2, title: 'Verify your email', desc: 'Check your inbox for a verification link. You can resend it from Profile anytime. Change your registered email later with password confirmation.', icon: 'fa-envelope-circle-check' },
+    { step: 3, title: 'Enable 2FA & unlock', desc: 'Turn on authenticator app or email OTP (or both) in Settings. Then unlock your vault with your master password.', icon: 'fa-mobile-screen-button' },
+    { step: 4, title: 'Add your first credential', desc: 'Go to Vault → Add Credential. Fill in service name, username, password, custom fields, tags, and optionally assign a folder.', icon: 'fa-plus' },
+    { step: 5, title: 'Organize & monitor', desc: 'Use folders, favorites, secure notes, the Security Dashboard, backups, and activity logs to stay in control.', icon: 'fa-chart-line' },
+    { step: 6, title: 'Export & protect', desc: 'Export encrypted backups or folder PDFs, review active sessions, and lock your vault when finished.', icon: 'fa-cloud-arrow-up' },
   ];
 
   const storableItems = [
@@ -43,22 +44,22 @@ const UserGuide = () => {
       icon: 'fa-vault',
       title: 'Vault',
       path: '/vault',
-      desc: 'Your central hub for all credentials. Search, filter by folder, sort by date, show/hide passwords, and copy values with one click.',
-      tips: ['Use the search bar to find credentials by service name or tag', 'Click a row to view full details', 'Deleted items go to Trash and can be restored'],
+      desc: 'Your central hub for all credentials. Search, filter by folder, sort by date, show/hide passwords with visibility toggles, and copy values with one click.',
+      tips: ['Use the search bar to find credentials by service name or tag', 'Click a row to view full details and custom fields', 'Deleted items go to Trash and can be restored'],
     },
     {
       icon: 'fa-folder',
       title: 'Folders',
       path: '/folders',
-      desc: 'Group credentials and notes into folders like Personal, Work, Banking, Social, and Development. Click a folder to see everything inside it.',
-      tips: ['Create custom folders for your workflow', 'Move credentials between folders when editing', 'Default folders are created automatically on signup'],
+      desc: 'Group credentials and notes into folders. Open a folder to view its contents, assign items, move entries in bulk, and export folder-wise PDF reports.',
+      tips: ['Use "Assign Items" to add credentials or notes to a folder', 'Move items between folders without re-entering data', 'Export a folder PDF after verifying your master password'],
     },
     {
       icon: 'fa-star',
       title: 'Favorites',
       path: '/favorites',
-      desc: 'Mark frequently used credentials as favorites for quick access from the Favorites page.',
-      tips: ['Toggle the star icon in the vault table or credential form', 'Great for daily-use accounts like email and work tools'],
+      desc: 'Mark frequently used credentials and secure notes as favorites for quick access from the dedicated Favorites page.',
+      tips: ['Toggle the star icon in the vault table or credential form', 'Favorite secure notes you reference often', 'Great for daily-use accounts like email and work tools'],
     },
     {
       icon: 'fa-wand-magic-sparkles',
@@ -78,33 +79,63 @@ const UserGuide = () => {
       icon: 'fa-sticky-note',
       title: 'Secure Notes',
       path: '/notes',
-      desc: 'Store encrypted text notes for information that is not a traditional login — recovery phrases, Wi-Fi details, or private memos.',
+      desc: 'Store encrypted text notes for recovery phrases, Wi-Fi details, or private memos. Search notes by title and assign them to folders.',
       tips: ['Assign notes to folders like credentials', 'Notes are encrypted the same way as vault data', 'Use clear titles for easy searching'],
+    },
+    {
+      icon: 'fa-mobile-screen-button',
+      title: 'Two-Factor Authentication',
+      path: '/settings',
+      desc: 'Enable TOTP (authenticator app), email OTP, or both. Add or remove individual methods, or disable all 2FA from Settings → Security.',
+      tips: ['Scan the QR code with Google Authenticator or similar', 'Email OTP sends a 6-digit code at login', 'If both are enabled, either code works at sign-in'],
+    },
+    {
+      icon: 'fa-user',
+      title: 'Profile & Account',
+      path: '/profile',
+      desc: 'Update your display name, change your account password, change your registered email, and resend email verification links.',
+      tips: ['Email change requires your password and a confirmation link to the new address', 'Your current email stays active until you confirm the change', 'Cancel a pending email change from Profile anytime'],
     },
     {
       icon: 'fa-cloud-arrow-up',
       title: 'Backup & Restore',
       path: '/backup',
-      desc: 'Export an encrypted backup of your entire vault. Restore from backup when switching devices or recovering data.',
-      tips: ['Store backups in a safe, offline location', 'PDF export contains decrypted data — handle with care', 'Re-enter master password to export or restore'],
+      desc: 'Export an encrypted backup of your entire vault, restore from backup, or generate a watermarked PDF export of your vault or folders.',
+      tips: ['Store encrypted backups in a safe, offline location', 'PDF exports contain decrypted data — handle with care', 'Re-enter master password to export or restore'],
+    },
+    {
+      icon: 'fa-trash',
+      title: 'Trash',
+      path: '/trash',
+      desc: 'Review soft-deleted credentials. Restore items you removed by mistake or permanently delete them. Empty trash to clear all deleted entries.',
+      tips: ['Deleted credentials are not gone immediately', 'Restore before emptying trash if you change your mind', 'Permanent deletion cannot be undone'],
     },
     {
       icon: 'fa-desktop',
       title: 'Sessions & Activity',
       path: '/sessions',
-      desc: 'View active login sessions across devices and review activity logs for logins, credential changes, exports, and security events.',
-      tips: ['Revoke unknown sessions immediately', 'Check activity logs after traveling', 'Use "Logout All Devices" if you suspect compromise'],
+      desc: 'View active login sessions across devices and review activity logs for logins, credential changes, exports, 2FA events, and email updates.',
+      tips: ['Revoke unknown sessions immediately', 'Check activity logs after traveling', 'Revoke all sessions if you suspect compromise'],
+    },
+    {
+      icon: 'fa-cog',
+      title: 'Settings',
+      path: '/settings',
+      desc: 'Switch light/dark theme, configure vault auto-lock minutes, manage two-factor authentication, and delete your account with password confirmation.',
+      tips: ['Set auto-lock to match how you use your device', 'Change master password from Settings → Security', 'Account deletion is permanent and requires your password'],
     },
   ];
 
   const passwords = [
     { label: 'Account Password', desc: 'Used to log in to LockForge. Hashed with Argon2id. Can be changed in Profile → Change Password.' },
-    { label: 'Master Password', desc: 'Encrypts and decrypts your vault. Never stored in plaintext. Required to unlock the vault. Cannot be recovered if lost.' },
+    { label: 'Master Password', desc: 'Encrypts and decrypts your vault. Never stored in plaintext. Required to unlock the vault. Can be changed in Settings → Change Master Password. Cannot be recovered if lost.' },
   ];
 
   const faqs = [
     { q: 'Why do I need to unlock the vault separately?', a: 'Your master password derives the encryption key for your credentials. Unlocking is an extra security layer — even if someone accesses your logged-in session, they cannot read vault data without your master password.' },
+    { q: 'How does two-factor authentication work?', a: 'You can enable authenticator app (TOTP) codes, email OTP codes, or both. At login, enter your password first, then the verification code. Manage methods individually from Settings.' },
     { q: 'What happens when I delete a credential?', a: 'Deleted credentials are moved to Trash first. You can restore them or permanently delete them. Empty Trash removes all trashed items forever.' },
+    { q: 'How do I change my registered email?', a: 'Go to Profile → Change Email, enter your new address and account password. A confirmation link is sent to the new email. Your current email stays active until you confirm.' },
     { q: 'Can I use LockForge on multiple devices?', a: 'Yes. Log in on any device with your account. Your vault data syncs through the server (encrypted). Unlock the vault on each device with your master password.' },
     { q: 'How do folders and tags differ?', a: 'Folders organize items into broad categories (one folder per item). Tags are flexible labels — you can add multiple tags to a credential for cross-cutting search.' },
   ];
@@ -123,7 +154,7 @@ const UserGuide = () => {
         <div className="container">
           <div className="text-center mb-5">
             <span className="section-badge">Quick Start</span>
-            <h2 className="section-title mt-3">Get up and running in 5 steps</h2>
+            <h2 className="section-title mt-3">Get up and running in 6 steps</h2>
           </div>
           <div className="row g-4">
             {quickStart.map((item) => (
@@ -228,10 +259,10 @@ const UserGuide = () => {
               <h2 className="section-title mt-3 mb-3">A typical session</h2>
               <div className="encryption-flow">
                 {[
-                  { icon: 'fa-right-to-bracket', title: 'Log in', desc: 'Use your account email and password' },
+                  { icon: 'fa-right-to-bracket', title: 'Log in', desc: 'Use your account email, password, and 2FA code if enabled' },
                   { icon: 'fa-unlock', title: 'Unlock vault', desc: 'Enter your master password once per session' },
-                  { icon: 'fa-search', title: 'Find & copy', desc: 'Search vault, copy username or password' },
-                  { icon: 'fa-lock', title: 'Lock when done', desc: 'Click Lock in the navbar or log out' },
+                  { icon: 'fa-search', title: 'Find & copy', desc: 'Search vault or notes, copy username or password' },
+                  { icon: 'fa-lock', title: 'Lock when done', desc: 'Click Lock in the navbar, or log out to end your session' },
                 ].map((step, i) => (
                   <div key={step.title} className="flow-step">
                     <div className="flow-icon"><i className={`fas ${step.icon}`} /></div>
@@ -250,12 +281,14 @@ const UserGuide = () => {
                 <ul className="checklist-modern">
                   {[
                     'Use a unique master password you do not use anywhere else',
+                    'Enable two-factor authentication in Settings',
                     'Enable vault auto-lock in Settings after periods of inactivity',
                     'Never share your master password or account credentials',
                     'Review the Security Dashboard monthly for weak or reused passwords',
                     'Export encrypted backups regularly and store them offline',
                     'Revoke unfamiliar sessions from the Sessions page',
                     'Use the password generator instead of reusing passwords',
+                    'Verify your email and keep your registered address up to date',
                   ].map((item) => (
                     <li key={item}><i className="fas fa-check-circle" /><span>{item}</span></li>
                   ))}

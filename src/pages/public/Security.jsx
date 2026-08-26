@@ -3,34 +3,40 @@ import AuthCTA from '../../components/AuthCTA';
 
 const Security = () => {
   const pillars = [
-    { icon: 'fa-lock', title: 'Encryption Architecture', desc: 'Credentials are encrypted with AES-256-GCM using keys derived from your master password via PBKDF2 (310,000 iterations). Only encrypted ciphertext is stored in the database — never plaintext.', tag: 'Core' },
+    { icon: 'fa-lock', title: 'Encryption Architecture', desc: 'Credentials and secure notes are encrypted with AES-256-GCM using keys derived from your master password via PBKDF2 (310,000 iterations). Only encrypted ciphertext is stored — never plaintext.', tag: 'Core' },
     { icon: 'fa-key', title: 'Master Password Security', desc: 'Your master password is never stored in plaintext. A cryptographic HMAC verifier validates unlock attempts without exposing the actual password or encryption key.', tag: 'Vault' },
     { icon: 'fa-microchip', title: 'Key Derivation (PBKDF2)', desc: 'PBKDF2 with SHA-512 and 310,000 iterations derives encryption keys from your master password and a unique per-user salt, making brute-force attacks computationally infeasible.', tag: 'KDF' },
     { icon: 'fa-fingerprint', title: 'Argon2id Password Hashing', desc: 'Account login passwords are hashed with Argon2id — a memory-hard algorithm designed to resist GPU, ASIC, and side-channel attacks.', tag: 'Auth' },
-    { icon: 'fa-ticket', title: 'JWT Session Management', desc: 'Short-lived access tokens (15 min) and refresh tokens (7 days) are stored in HTTP-only, SameSite cookies. Bearer token fallback ensures reliable SPA authentication.', tag: 'Sessions' },
+    { icon: 'fa-mobile-screen-button', title: 'Two-Factor Authentication', desc: 'Optional TOTP (authenticator app) and email OTP protect your account at login. Enable one or both methods and manage them individually from Settings.', tag: '2FA' },
+    { icon: 'fa-envelope-circle-check', title: 'Email Verification & Change', desc: 'Signup email verification, resend support, and secure email change with password confirmation plus a verification link sent to the new address.', tag: 'Identity' },
+    { icon: 'fa-ticket', title: 'JWT Session Management', desc: 'Short-lived access tokens (15 min) and refresh tokens (7 days) with HTTP-only cookies and Bearer token fallback for reliable SPA authentication.', tag: 'Sessions' },
     { icon: 'fa-desktop', title: 'Active Session Control', desc: 'View all active sessions with device info, browser, IP address, and last activity. Revoke individual sessions or logout all devices instantly.', tag: 'Control' },
-    { icon: 'fa-gauge-high', title: 'Rate Limiting', desc: 'Authentication endpoints are rate-limited (10 login attempts / 15 min) to prevent brute-force attacks. Global API rate limiting protects against abuse.', tag: 'Defense' },
+    { icon: 'fa-unlock-keyhole', title: 'Session-Bound Vault Keys', desc: 'Vault encryption keys are tied to your authenticated session in the database — not held in volatile server memory — so production deployments stay consistent and secure.', tag: 'Vault' },
+    { icon: 'fa-gauge-high', title: 'Rate Limiting', desc: 'Authentication endpoints are rate-limited to prevent brute-force attacks. Login, register, and 2FA verification have dedicated throttling limits.', tag: 'Defense' },
     { icon: 'fa-shield-virus', title: 'CSRF & XSS Protection', desc: 'Helmet security headers, input validation, sanitized error responses, and SameSite cookies protect against cross-site scripting and request forgery.', tag: 'Web' },
-    { icon: 'fa-eye-slash', title: 'Zero Sensitive Logging', desc: 'Passwords, encryption keys, decrypted credentials, and tokens are never written to logs, error responses, or activity records.', tag: 'Privacy' },
+    { icon: 'fa-eye-slash', title: 'Zero Sensitive Logging', desc: 'Passwords, encryption keys, decrypted credentials, OTP codes, and tokens are never written to logs, error responses, or activity records.', tag: 'Privacy' },
   ];
 
   const layers = [
     { layer: 'Transport', tech: 'HTTPS / TLS', desc: 'All data encrypted in transit between client and server.' },
-    { layer: 'Authentication', tech: 'Argon2id + JWT', desc: 'Memory-hard password hashing with short-lived token sessions.' },
+    { layer: 'Authentication', tech: 'Argon2id + JWT + 2FA', desc: 'Memory-hard password hashing, short-lived tokens, and optional TOTP or email OTP.' },
     { layer: 'Vault Encryption', tech: 'AES-256-GCM', desc: 'Authenticated encryption with unique IVs and auth tags per field.' },
     { layer: 'Key Derivation', tech: 'PBKDF2-SHA512', desc: '310,000 iterations with per-user salt for key stretching.' },
+    { layer: 'Session Vault Keys', tech: 'Encrypted Session Store', desc: 'Vault keys persisted per session — survives serverless restarts without exposing plaintext.' },
     { layer: 'Database', tech: 'MongoDB', desc: 'Only encrypted ciphertext stored. No plaintext secrets ever persisted.' },
-    { layer: 'API Security', tech: 'Helmet + CORS + Rate Limit', desc: 'Security headers, origin validation, and request throttling.' },
+    { layer: 'API Security', tech: 'Helmet + CORS + Rate Limit', desc: 'Security headers, origin validation, and request throttling on sensitive routes.' },
   ];
 
   const practices = [
     'Use a unique, strong master password you don\'t use anywhere else',
-    'Enable vault auto-lock after periods of inactivity',
+    'Enable two-factor authentication — TOTP, email OTP, or both',
+    'Enable vault auto-lock after periods of inactivity in Settings',
     'Regularly review your Security Dashboard for weak or reused passwords',
     'Revoke unknown sessions immediately from the Sessions page',
-    'Export encrypted backups periodically and store them securely',
+    'Export encrypted backups periodically and store them securely offline',
+    'Verify your email and use the secure email change flow if your address changes',
     'Never share your master password or account credentials',
-    'Review activity logs for unauthorized access attempts',
+    'Review activity logs for unauthorized access or export attempts',
   ];
 
   return (
@@ -47,7 +53,7 @@ const Security = () => {
         <div className="container">
           <div className="text-center mb-5">
             <span className="section-badge">Security Pillars</span>
-            <h2 className="section-title mt-3">Nine layers of protection</h2>
+            <h2 className="section-title mt-3">Twelve layers of protection</h2>
           </div>
           <div className="row g-4">
             {pillars.map((p) => (
@@ -82,7 +88,7 @@ const Security = () => {
                   { icon: 'fa-gears', title: 'PBKDF2 derives encryption key', desc: '310K iterations + unique salt per user' },
                   { icon: 'fa-shield-halved', title: 'AES-256-GCM encrypts data', desc: 'Each field gets unique IV + authentication tag' },
                   { icon: 'fa-database', title: 'Ciphertext stored in MongoDB', desc: 'Only encrypted blobs — no readable secrets' },
-                  { icon: 'fa-unlock-keyhole', title: 'Unlock to decrypt on demand', desc: 'Key held in memory, auto-expires after inactivity' },
+                  { icon: 'fa-unlock-keyhole', title: 'Unlock to decrypt on demand', desc: 'Session-bound key with configurable auto-lock timeout' },
                 ].map((step, i) => (
                   <div key={step.title} className="flow-step">
                     <div className="flow-icon"><i className={`fas ${step.icon}`} /></div>
