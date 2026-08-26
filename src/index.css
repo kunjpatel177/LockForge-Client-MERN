@@ -10,7 +10,7 @@
   --text-secondary: #64748b;
   --text-muted: #94a3b8;
   --border-color: #e2e8f0;
-  --navbar-bg: rgba(255, 255, 255, 0.7);
+  --navbar-bg: rgba(255, 255, 255, 0.95);
   --sidebar-bg: #0f172a;
   --sidebar-text: #94a3b8;
   --sidebar-active: #f8fafc;
@@ -39,7 +39,7 @@
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --border-color: #1e293b;
-  --navbar-bg: rgba(11, 15, 26, 0.7);
+  --navbar-bg: rgba(11, 15, 26, 0.98);
   --sidebar-bg: #080c16;
   --sidebar-text: #64748b;
   --sidebar-active: #f1f5f9;
@@ -118,7 +118,7 @@ a:hover {
   right: 0;
   z-index: 100;
   width: 100%;
-  background: var(--navbar-bg);
+  background: var(--navbar-bg) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border-bottom: 1px solid var(--border-color);
@@ -368,6 +368,7 @@ a:hover {
 /* Legacy aliases */
 .navbar-glass {
   background: var(--navbar-bg) !important;
+  /* background: rgba(255, 255, 255, 0.95) !important; */
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border-bottom: 1px solid var(--border-color);
