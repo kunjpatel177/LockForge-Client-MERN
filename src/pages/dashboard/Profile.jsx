@@ -9,10 +9,14 @@ import PasswordInput from '../../components/PasswordInput';
 const Profile = () => {
   const { user, refreshProfile } = useAuth();
   const [name, setName] = useState(user?.name || '');
+  const [newEmail, setNewEmail] = useState('');
+  const [emailPassword, setEmailPassword] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
@@ -23,6 +27,30 @@ const Profile = () => {
       toast.success('Profile updated');
     } catch (err) { toast.error(handleApiError(err).message); }
     finally { setLoading(false); }
+  };
+
+  const handleEmailChange = async (e) => {
+    e.preventDefault();
+    if (!newEmail.trim()) return toast.error('Enter a new email address');
+    setEmailLoading(true);
+    try {
+      await userAPI.requestEmailChange({ newEmail, password: emailPassword });
+      await refreshProfile();
+      toast.success('Verification link sent to your new email address');
+      setNewEmail('');
+      setEmailPassword('');
+    } catch (err) { toast.error(handleApiError(err).message); }
+    finally { setEmailLoading(false); }
+  };
+
+  const handleCancelEmailChange = async () => {
+    setCancelLoading(true);
+    try {
+      await userAPI.cancelEmailChange();
+      await refreshProfile();
+      toast.success('Email change request cancelled');
+    } catch (err) { toast.error(handleApiError(err).message); }
+    finally { setCancelLoading(false); }
   };
 
   const handlePasswordChange = async (e) => {
@@ -65,10 +93,27 @@ const Profile = () => {
         </div>
       </div>
 
-      {!user?.emailVerified && (
+      {!user?.emailVerified && !user?.pendingEmail && (
         <div className="alert alert-warning d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
           <span><i className="fas fa-envelope me-2" />Please verify your email address for full account security.</span>
           <button type="button" className="btn btn-sm btn-warning" onClick={handleResendVerification}>Resend Email</button>
+        </div>
+      )}
+
+      {user?.pendingEmail && (
+        <div className="alert alert-info d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+          <span>
+            <i className="fas fa-envelope me-2" />
+            Email change pending. Check <strong>{user.pendingEmail}</strong> for a confirmation link.
+          </span>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-secondary"
+            onClick={handleCancelEmailChange}
+            disabled={cancelLoading}
+          >
+            {cancelLoading ? 'Cancelling...' : 'Cancel Request'}
+          </button>
         </div>
       )}
 
@@ -92,6 +137,49 @@ const Profile = () => {
                 <input className="form-control form-control-modern" value={user?.email || ''} disabled />
               </div>
               <button type="submit" className="btn btn-primary btn-modern" disabled={loading}>Update Profile</button>
+            </form>
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          <div className="settings-card">
+            <div className="settings-card-header">
+              <div className="settings-card-icon"><i className="fas fa-envelope" /></div>
+              <div>
+                <h5 className="fw-bold mb-0">Change Email</h5>
+                <small className="text-muted">Update your registered email address</small>
+              </div>
+            </div>
+            <form onSubmit={handleEmailChange} className="settings-card-body">
+              <p className="text-muted small">
+                A confirmation link will be sent to your new email. Your current email stays active until you confirm the change.
+              </p>
+              <div className="mb-3">
+                <label className="form-label">New Email</label>
+                <input
+                  type="email"
+                  className="form-control form-control-modern"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  disabled={!!user?.pendingEmail}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Account Password</label>
+                <PasswordInput
+                  className="form-control form-control-modern"
+                  value={emailPassword}
+                  onChange={(e) => setEmailPassword(e.target.value)}
+                  placeholder="Confirm with your password"
+                  disabled={!!user?.pendingEmail}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary btn-modern" disabled={emailLoading || !!user?.pendingEmail}>
+                {emailLoading ? 'Sending...' : 'Send Verification Link'}
+              </button>
             </form>
           </div>
         </div>

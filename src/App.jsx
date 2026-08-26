@@ -18,6 +18,7 @@ import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import VerifyEmail from './pages/auth/VerifyEmail';
+import VerifyEmailChange from './pages/auth/VerifyEmailChange';
 
 import Dashboard from './pages/dashboard/Dashboard';
 import Vault from './pages/dashboard/Vault';
@@ -55,6 +56,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/verify-email-change" element={<VerifyEmailChange />} />
             </Route>
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />

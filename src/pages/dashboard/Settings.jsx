@@ -107,6 +107,9 @@ const Settings = () => {
                 <small className="text-muted">Vault locks after this period of inactivity</small>
               </div>
               <div className="d-flex flex-column gap-2">
+                <Link to="/profile" className="btn btn-ghost text-start">
+                  <i className="fas fa-user me-2" />Edit Profile & Email
+                </Link>
                 <Link to="/change-master-password" className="btn btn-ghost text-start">
                   <i className="fas fa-key me-2" />Change Master Password
                 </Link>
