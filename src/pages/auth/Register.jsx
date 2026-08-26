@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import PasswordInput from '../../components/PasswordInput';
+import BrandLogo from '../../components/BrandLogo';
 
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', masterPassword: '', confirmPassword: '', confirmMaster: '' });
@@ -35,7 +36,9 @@ const Register = () => {
           <div className="col-md-6">
             <div className="auth-card p-4">
               <div className="text-center mb-4">
-                <i className="fas fa-shield-halved fa-3x text-primary mb-3" />
+                <div className="auth-brand-logo">
+                  <BrandLogo size="lg" />
+                </div>
                 <h2 className="fw-bold">Create Account</h2>
                 <p className="text-muted">Start securing your passwords with LockForge</p>
               </div>

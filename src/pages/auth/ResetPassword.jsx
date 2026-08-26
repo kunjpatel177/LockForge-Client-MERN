@@ -4,6 +4,7 @@ import { authAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import PasswordInput from '../../components/PasswordInput';
+import BrandLogo from '../../components/BrandLogo';
 
 const ResetPassword = () => {
   const [params] = useSearchParams();
@@ -34,7 +35,12 @@ const ResetPassword = () => {
         <div className="row justify-content-center">
           <div className="col-md-5">
             <div className="auth-card p-4">
-              <h2 className="fw-bold text-center mb-4">Reset Password</h2>
+              <div className="text-center mb-4">
+                <div className="auth-brand-logo">
+                  <BrandLogo size="lg" />
+                </div>
+                <h2 className="fw-bold">Reset Password</h2>
+              </div>
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">New Password</label>

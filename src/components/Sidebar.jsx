@@ -32,10 +32,16 @@ const navSections = [
 ];
 
 const Sidebar = ({ show, onClose }) => (
-  <aside className={`sidebar ${show ? 'show' : ''}`}>
+  <aside
+    className={`sidebar ${show ? 'show' : ''}`}
+    aria-hidden={!show}
+    aria-label="Dashboard navigation"
+  >
     <div className="sidebar-header d-lg-none">
       <span className="fw-bold">Menu</span>
-      <button type="button" className="btn btn-sm btn-link" onClick={onClose}><i className="fas fa-times" /></button>
+      <button type="button" className="sidebar-close-btn" onClick={onClose} aria-label="Close menu">
+        <i className="fas fa-times" />
+      </button>
     </div>
     <nav className="sidebar-nav">
       {navSections.map((section, idx) => (

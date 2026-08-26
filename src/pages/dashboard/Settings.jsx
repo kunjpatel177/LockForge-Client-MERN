@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
 import ConfirmModal from '../../components/ConfirmModal';
 import PasswordInput from '../../components/PasswordInput';
+import TwoFactorSettings from '../../components/TwoFactorSettings';
 
 const Settings = () => {
   const { user, refreshProfile, destroyAuth } = useAuth();
@@ -94,6 +95,12 @@ const Settings = () => {
               </div>
             </div>
             <div className="settings-card-body">
+              <div className="mb-4">
+                <TwoFactorSettings
+                  enabled={user?.twoFactorEnabled}
+                  onStatusChange={() => refreshProfile()}
+                />
+              </div>
               <div className="mb-3">
                 <label className="form-label">Auto-lock (minutes)</label>
                 <input type="number" className="form-control form-control-modern" min="1" max="120" value={autoLock} onChange={(e) => setAutoLock(parseInt(e.target.value))} />

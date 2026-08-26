@@ -90,8 +90,41 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     authCheckRef.current += 1;
     const res = await authAPI.login({ email, password });
-    setStoredToken(res.data.data.accessToken, res.data.data.refreshToken);
-    setUser(res.data.data.user);
+    const data = res.data.data;
+
+    if (data.requiresTwoFactor) {
+      return {
+        requiresTwoFactor: true,
+        twoFactorToken: data.twoFactorToken,
+        twoFactorMethods: data.twoFactorMethods || [],
+        maskedEmail: data.maskedEmail,
+      };
+    }
+
+    setStoredToken(data.accessToken, data.refreshToken);
+    setUser(data.user);
+
+    try {
+      await loadSessionData(authCheckRef.current);
+    } catch {
+      setVaultUnlocked(false);
+    }
+
+    setLoading(false);
+    return res.data;
+  };
+
+  const resendTwoFactor = async (twoFactorToken) => {
+    const res = await authAPI.resendTwoFactor({ twoFactorToken });
+    return res.data.data;
+  };
+
+  const verifyTwoFactor = async (twoFactorToken, token) => {
+    authCheckRef.current += 1;
+    const res = await authAPI.verifyTwoFactor({ twoFactorToken, token });
+    const data = res.data.data;
+    setStoredToken(data.accessToken, data.refreshToken);
+    setUser(data.user);
 
     try {
       await loadSessionData(authCheckRef.current);
@@ -164,7 +197,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, stats, loading, vaultUnlocked, login, register, logout, endSession, destroyAuth,
+      user, stats, loading, vaultUnlocked, login, verifyTwoFactor, resendTwoFactor, register, logout, endSession, destroyAuth,
       unlockVault, lockVault, syncVaultStatus, refreshProfile, checkAuth, isAuthenticated: !!user,
     }}>
       {children}

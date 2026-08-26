@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import AuthCTA from '../../components/AuthCTA';
+import BrandLogo from '../../components/BrandLogo';
 import { ownerInfo } from '../../config/owner';
 import { API_BASE_URL } from '../../config/api';
 
@@ -112,7 +113,10 @@ const Home = () => {
               <div className="hero-mockup">
                 <div className="mockup-header">
                   <span className="mockup-dot red" /><span className="mockup-dot yellow" /><span className="mockup-dot green" />
-                  <span className="mockup-title">LockForge Vault</span>
+                  <span className="mockup-title d-inline-flex align-items-center gap-2">
+                    <BrandLogo size="xs" />
+                    LockForge Vault
+                  </span>
                 </div>
                 <div className="mockup-body">
                   {[

@@ -5,8 +5,8 @@
  *   photo: '/owner.jpg'
  */
 export const ownerInfo = {
-  photo: '../public/kunj.jpg', // e.g. '/owner.jpg' after adding image to client/public/
-  // photo: '../public/IMG-20260220-WA0005.jpg', // e.g. '/owner.jpg' after adding image to client/public/
+  photo: '/kunj.jpg', // e.g. '/owner.jpg' after adding image to client/public/
+  // photo: '/IMG-20260220-WA0005.jpg', // e.g. '/owner.jpg' after adding image to client/public/
   name: 'Kunj M. Patel',
   role: '', // e.g. Founder & Developer
   email: 'kunjmpatel1774@gmail.com', // e.g. kunj@example.com

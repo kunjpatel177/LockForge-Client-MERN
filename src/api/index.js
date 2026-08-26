@@ -3,6 +3,8 @@ import api from './axios';
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
+  verifyTwoFactor: (data) => api.post('/auth/verify-2fa', data),
+  resendTwoFactor: (data) => api.post('/auth/resend-2fa', data),
   logout: () => api.post('/auth/logout'),
   verifyEmail: (token) => api.post('/auth/verify-email', { token }),
   resendVerification: () => api.post('/auth/resend-verification'),
@@ -19,6 +21,15 @@ export const userAPI = {
   changePassword: (data) => api.put('/users/change-password', data),
   changeMasterPassword: (data) => api.put('/users/change-master-password', data),
   deleteAccount: (password) => api.delete('/users/account', { data: { password } }),
+  getTwoFactorStatus: () => api.get('/users/2fa/status'),
+  setupTwoFactor: (password, methods) => api.post('/users/2fa/setup', { password, methods }),
+  enableTwoFactor: (data) => api.post('/users/2fa/enable', data),
+  requestDisableTwoFactor: (password) => api.post('/users/2fa/disable/request', { password }),
+  disableTwoFactor: (data) => api.post('/users/2fa/disable', data),
+  setupAddMethod: (password, method) => api.post('/users/2fa/methods/add/setup', { password, method }),
+  confirmAddMethod: (data) => api.post('/users/2fa/methods/add', data),
+  requestRemoveMethod: (password, method) => api.post('/users/2fa/methods/remove/request', { password, method }),
+  removeMethod: (data) => api.post('/users/2fa/methods/remove', data),
 };
 
 export const vaultAPI = {

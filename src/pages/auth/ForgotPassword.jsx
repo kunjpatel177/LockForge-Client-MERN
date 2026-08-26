@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { authAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
+import BrandLogo from '../../components/BrandLogo';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -29,7 +30,14 @@ const ForgotPassword = () => {
         <div className="row justify-content-center">
           <div className="col-md-5">
             <div className="auth-card p-4">
-              <h2 className="fw-bold text-center mb-4">Forgot Password</h2>
+              <div className="text-center mb-4">
+                {!sent && (
+                  <div className="auth-brand-logo">
+                    <BrandLogo size="lg" />
+                  </div>
+                )}
+                <h2 className="fw-bold">Forgot Password</h2>
+              </div>
               {sent ? (
                 <div className="text-center">
                   <i className="fas fa-envelope fa-3x text-primary mb-3" />

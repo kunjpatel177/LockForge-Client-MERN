@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { authAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import BrandLogo from '../../components/BrandLogo';
 
 const VerifyEmail = () => {
   const [params] = useSearchParams();
@@ -23,6 +24,9 @@ const VerifyEmail = () => {
         <div className="row justify-content-center">
           <div className="col-md-5">
             <div className="auth-card p-4 text-center">
+              <div className="auth-brand-logo">
+                <BrandLogo size="lg" />
+              </div>
               {status === 'loading' && <LoadingSpinner />}
               {status === 'success' && (
                 <>

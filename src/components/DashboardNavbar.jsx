@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import BrandLogo from './BrandLogo';
 
 const DashboardNavbar = ({ onToggleSidebar }) => {
   const { user, logout, lockVault, vaultUnlocked } = useAuth();
@@ -32,7 +33,7 @@ const DashboardNavbar = ({ onToggleSidebar }) => {
             <i className="fas fa-bars" />
           </button>
           <Link className="navbar-pro-brand" to="/">
-            <span className="brand-icon"><i className="fas fa-shield-halved" /></span>
+            <span className="brand-icon"><BrandLogo size="sm" /></span>
             <span className="d-none d-sm-inline">LockForge</span>
           </Link>
         </div>
@@ -72,7 +73,7 @@ const DashboardNavbar = ({ onToggleSidebar }) => {
             </button>
             <ul className="dropdown-menu dropdown-menu-end navbar-pro-dropdown">
               <li className="dropdown-header">
-                <strong>{user?.name}</strong>
+                <strong className='text-primary'>{user?.name.toUpperCase()}</strong>
                 <small className="d-block text-muted">{user?.email}</small>
               </li>
               <li><hr className="dropdown-divider" /></li>

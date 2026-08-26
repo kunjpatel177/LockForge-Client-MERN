@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import BrandLogo from './BrandLogo';
 
 const navItems = [
   { to: '/', label: 'Home', end: true },
@@ -29,7 +30,7 @@ const PublicNavbar = () => {
     <header className="navbar-pro navbar-expand-lg">
       <div className="container navbar-pro-container">
         <Link className="navbar-pro-brand" to="/" onClick={closeMobileMenu}>
-          <span className="brand-icon"><i className="fas fa-shield-halved" /></span>
+          <span className="brand-icon"><BrandLogo size="sm" /></span>
           <span>LockForge</span>
         </Link>
 
