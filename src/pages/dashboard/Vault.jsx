@@ -7,8 +7,12 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
 import VaultLockedState from '../../components/VaultLockedState';
 import EmptyState from '../../components/EmptyState';
+import MoveToFolderModal from '../../components/MoveToFolderModal';
+import PasswordReveal from '../../components/PasswordReveal';
+import { useConfirm } from '../../hooks/useConfirm';
 
 const Vault = () => {
+  const { confirm, ConfirmDialog } = useConfirm();
   const { vaultUnlocked } = useOutletContext();
   const [credentials, setCredentials] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -16,7 +20,7 @@ const Vault = () => {
   const [search, setSearch] = useState('');
   const [folderFilter, setFolderFilter] = useState('');
   const [sort, setSort] = useState('updatedAt');
-  const [showPasswords, setShowPasswords] = useState({});
+  const [moveItem, setMoveItem] = useState(null);
 
   const load = async () => {
     if (!vaultUnlocked) { setLoading(false); return; }
@@ -37,7 +41,13 @@ const Vault = () => {
   useEffect(() => { load(); }, [vaultUnlocked, search, folderFilter, sort]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Move to trash?')) return;
+    const ok = await confirm({
+      title: 'Move to Trash',
+      message: 'This credential will be moved to trash. You can restore it later.',
+      confirmLabel: 'Move to trash',
+      icon: 'fa-trash',
+    });
+    if (!ok) return;
     try {
       await vaultAPI.delete(id);
       toast.success('Moved to trash');
@@ -51,6 +61,15 @@ const Vault = () => {
       load();
     } catch (err) { toast.error(handleApiError(err).message); }
   };
+
+  const handleMove = async (folderId) => {
+    if (!moveItem) return;
+    await vaultAPI.moveToFolder(moveItem.id, folderId);
+    toast.success(folderId ? 'Moved to folder' : 'Removed from folder');
+    load();
+  };
+
+  const folderName = (folderId) => folders.find((f) => String(f.id) === String(folderId))?.name || 'Unknown';
 
   const copyToClipboard = (text, label) => {
     navigator.clipboard.writeText(text);
@@ -69,26 +88,24 @@ const Vault = () => {
     );
   };
 
-  const renderPasswordCell = (cred) => {
-    if (!cred.password) return <span className="text-muted">No Password</span>;
-    return (
-      <>
-        <code>{showPasswords[cred.id] ? cred.password : '••••••••'}</code>
-        <button type="button" className="btn btn-link btn-sm p-0 ms-1" onClick={() => setShowPasswords({ ...showPasswords, [cred.id]: !showPasswords[cred.id] })}>
-          <i className={`fas ${showPasswords[cred.id] ? 'fa-eye-slash' : 'fa-eye'}`} />
-        </button>
-        <button type="button" className="btn btn-link btn-sm p-0 ms-1" onClick={() => copyToClipboard(cred.password, 'Password')}>
-          <i className="fas fa-copy" />
-        </button>
-      </>
-    );
-  };
+  const renderPasswordCell = (cred) => (
+    <PasswordReveal value={cred.password} onCopy={copyToClipboard} />
+  );
 
   if (!vaultUnlocked) return <VaultLockedState />;
   if (loading) return <LoadingSpinner />;
 
   return (
     <div>
+      {ConfirmDialog}
+      <MoveToFolderModal
+        show={!!moveItem}
+        itemType="credential"
+        itemName={moveItem?.name}
+        currentFolderId={moveItem?.folderId}
+        onClose={() => setMoveItem(null)}
+        onMove={handleMove}
+      />
       <DashboardPageHeader
         icon="fa-vault"
         title="Vault"
@@ -130,6 +147,7 @@ const Vault = () => {
               <tr>
                 <th style={{ width: 40 }} />
                 <th>Service</th>
+                <th>Folder</th>
                 <th>Username</th>
                 <th>Email</th>
                 <th>Password</th>
@@ -146,12 +164,20 @@ const Vault = () => {
                     </button>
                   </td>
                   <td><Link to={`/vault/${c.id}`} className="fw-semibold text-decoration-none">{c.serviceName}</Link></td>
+                  <td>
+                    {c.folderId ? (
+                      <Link to={`/folders/${c.folderId}`} className="dash-badge primary text-decoration-none">{folderName(c.folderId)}</Link>
+                    ) : <span className="text-muted small">Unassigned</span>}
+                  </td>
                   <td>{renderFieldCell(c.username, 'No Username', 'Username')}</td>
                   <td>{renderFieldCell(c.email, 'No Email', 'Email')}</td>
                   <td>{renderPasswordCell(c)}</td>
                   <td className="text-muted small">{new Date(c.updatedAt).toLocaleDateString()}</td>
                   <td>
                     <div className="d-flex gap-1">
+                      <button type="button" className="dash-action-btn" title="Move to folder" onClick={() => setMoveItem({ id: c.id, name: c.serviceName, folderId: c.folderId })}>
+                        <i className="fas fa-folder-open" />
+                      </button>
                       <Link to={`/vault/${c.id}/edit`} className="dash-action-btn" title="Edit"><i className="fas fa-pen" /></Link>
                       <button type="button" className="dash-action-btn danger" title="Delete" onClick={() => handleDelete(c.id)}><i className="fas fa-trash" /></button>
                     </div>

@@ -466,7 +466,7 @@ a:hover { color: var(--primary-hover); }
   font-weight: 600;
   padding: 0.6rem 1.4rem;
   transition: all 0.25s;
-  border: none;
+  /* border: none; */
 }
 
 .folder-btn{
@@ -1658,6 +1658,31 @@ a:hover { color: var(--primary-hover); }
 
 .dash-search-wrap .form-control { padding-left: 2.25rem; }
 
+.password-input-wrap {
+  position: relative;
+}
+
+.password-input-wrap .form-control {
+  padding-right: 2.75rem;
+}
+
+.password-input-toggle {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.35rem 0.5rem;
+  line-height: 1;
+  z-index: 2;
+}
+
+.password-input-toggle:hover {
+  color: var(--primary);
+}
+
 .dash-quick-actions {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -1764,6 +1789,12 @@ a:hover { color: var(--primary-hover); }
   color: inherit;
 }
 
+.fav-card-creds{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .favorite-card-icon {
   width: 40px; height: 40px;
   border-radius: 10px;
@@ -1782,6 +1813,15 @@ a:hover { color: var(--primary-hover); }
   height: 100%;
 }
 
+.note-card-clickable {
+  cursor: pointer;
+}
+
+.note-card-clickable:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
 .note-card:hover { box-shadow: var(--shadow-md); }
 
 .note-card-header {
@@ -1792,7 +1832,41 @@ a:hover { color: var(--primary-hover); }
   margin-bottom: 0.75rem;
 }
 
-.note-card-title { font-weight: 700; font-size: 1rem; margin: 0; }
+.note-card-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  /* display: flex;
+  justify-content: space-between;
+  align-items: flex-start; */
+}
+
+.note-card-preview,
+.note-view-content,
+.credential-notes-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.note-card-preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-view-content {
+  background: var(--bg-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  min-height: 120px;
+  line-height: 1.6;
+}
 
 .security-score-card {
   background: var(--bg-card);
@@ -1894,6 +1968,55 @@ a:hover { color: var(--primary-hover); }
   display: flex; align-items: center; justify-content: center;
 }
 
+.settings-card-icon.danger {
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+}
+
+.danger-zone-card {
+  border-color: rgba(220, 53, 69, 0.25);
+}
+
+.confirm-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1055;
+}
+
+.assign-items-list {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+}
+
+.assign-item-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 0 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  margin: 0;
+}
+
+.assign-item-row:last-child { border-bottom: none; }
+.assign-item-row:hover { background: var(--bg-alt); }
+.assign-item-row input { grid-row: 1 / span 2; }
+.assign-item-title { font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+.assign-item-folder {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary);
+  white-space: nowrap;
+}
+.assign-item-meta { grid-column: 2; }
+
 .settings-card-body { padding: 1.25rem; }
 
 .profile-header-card {
@@ -1948,9 +2071,20 @@ a:hover { color: var(--primary-hover); }
 
 .credential-field-value {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
   flex-wrap: wrap;
+  min-width: 0;
+}
+
+.credential-field-value > span,
+.credential-field-value > a,
+.credential-field-value > code,
+.credential-field-value > p {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .credential-field-value code {
@@ -2792,8 +2926,8 @@ body {
 
   .nav-tabs.folder-tabs {
     flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    /* overflow-x: auto; */
+    /* -webkit-overflow-scrolling: touch; */
     border-bottom: 1px solid var(--border-color);
   }
 

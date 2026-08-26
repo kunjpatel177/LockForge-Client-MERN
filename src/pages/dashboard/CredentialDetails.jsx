@@ -5,13 +5,15 @@ import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import VaultLockedState from '../../components/VaultLockedState';
+import PasswordReveal from '../../components/PasswordReveal';
+import { useConfirm } from '../../hooks/useConfirm';
 
 const CredentialDetails = () => {
+  const { confirm, ConfirmDialog } = useConfirm();
   const { id } = useParams();
   const navigate = useNavigate();
   const { vaultUnlocked } = useOutletContext();
   const [cred, setCred] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +27,13 @@ const CredentialDetails = () => {
   const copy = (text, label) => { navigator.clipboard.writeText(text); toast.success(`${label} copied!`); };
 
   const handleDelete = async () => {
-    if (!window.confirm('Move to trash?')) return;
+    const ok = await confirm({
+      title: 'Move to Trash',
+      message: 'This credential will be moved to trash. You can restore it later.',
+      confirmLabel: 'Move to trash',
+      icon: 'fa-trash',
+    });
+    if (!ok) return;
     try {
       await vaultAPI.delete(id);
       toast.success('Moved to trash');
@@ -45,6 +53,7 @@ const CredentialDetails = () => {
 
   return (
     <div>
+      {ConfirmDialog}
       <div className="dash-breadcrumb mb-3">
         <Link to="/vault"><i className="fas fa-arrow-left me-1" />Back to Vault</Link>
       </div>
@@ -53,7 +62,7 @@ const CredentialDetails = () => {
         <div className="d-flex align-items-center gap-3">
           <div className="dash-page-icon"><i className="fas fa-key" /></div>
           <div>
-            <h1 className="dash-page-title mb-0">{cred.serviceName}</h1>
+            <h1 className="dash-page-title mb-1">{cred.serviceName}</h1>
             {cred.isFavorite && <span className="dash-badge warning mt-1"><i className="fas fa-star" />Favorite</span>}
           </div>
         </div>
@@ -92,11 +101,11 @@ const CredentialDetails = () => {
               <div className="credential-field">
                 <div className="credential-field-label">Password</div>
                 <div className="credential-field-value">
-                  <code>{showPassword ? cred.password : '••••••••'}</code>
-                  <button type="button" className="dash-action-btn" onClick={() => setShowPassword(!showPassword)}>
-                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} />
-                  </button>
-                  {cred.password && <CopyBtn text={cred.password} label="Password" />}
+                  <PasswordReveal
+                    value={cred.password}
+                    buttonClassName="dash-action-btn"
+                    onCopy={copy}
+                  />
                 </div>
               </div>
             </div>
@@ -118,7 +127,7 @@ const CredentialDetails = () => {
           <div className="credential-detail-section">
             <div className="credential-field">
               <div className="credential-field-label">Notes</div>
-              <p className="mb-0" style={{ whiteSpace: 'pre-wrap' }}>{cred.notes}</p>
+              <p className="credential-notes-content mb-0">{cred.notes}</p>
             </div>
           </div>
         )}
@@ -138,17 +147,25 @@ const CredentialDetails = () => {
           <div className="credential-detail-section">
             <div className="credential-field-label mb-3">Custom Fields</div>
             <div className="row g-3">
-              {cred.customFields.map((cf, i) => (
+              {cred.customFields.map((cf, i) => {
+                const isPasswordField = /password|pin|passcode|secret/i.test(cf.label || '');
+                return (
                 <div key={i} className="col-md-6">
                   <div className="credential-field">
                     <div className="credential-field-label">{cf.label}</div>
                     <div className="credential-field-value">
-                      <span>{cf.value}</span>
-                      <CopyBtn text={cf.value} label={cf.label} />
+                      {isPasswordField ? (
+                        <PasswordReveal value={cf.value} buttonClassName="dash-action-btn" onCopy={copy} copyLabel={cf.label} />
+                      ) : (
+                        <>
+                          <span>{cf.value}</span>
+                          <CopyBtn text={cf.value} label={cf.label} />
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
+              );})}
             </div>
           </div>
         )}

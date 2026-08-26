@@ -6,14 +6,19 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
 import EmptyState from '../../components/EmptyState';
+import AssignItemsModal from '../../components/AssignItemsModal';
+import { useConfirm } from '../../hooks/useConfirm';
+import { LIMITS } from '../../config/limits';
 
 const Folders = () => {
+  const { confirm, ConfirmDialog } = useConfirm();
   const navigate = useNavigate();
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState('');
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState('');
+  const [assignFolder, setAssignFolder] = useState(null);
 
   const load = async () => {
     try {
@@ -29,11 +34,20 @@ const Folders = () => {
     e.preventDefault();
     if (!newName.trim()) return;
     try {
-      await folderAPI.create(newName.trim());
+      const res = await folderAPI.create(newName.trim());
       setNewName('');
       toast.success('Folder created');
+      setAssignFolder(res.data.data);
       load();
     } catch (err) { toast.error(handleApiError(err).message); }
+  };
+
+  const handleAssignAfterCreate = async ({ credentialIds, noteIds }) => {
+    if (!assignFolder?.id) return;
+    await folderAPI.assignItems(assignFolder.id, { credentialIds, noteIds });
+    toast.success('Items added to folder');
+    load();
+    navigate(`/folders/${assignFolder.id}`);
   };
 
   const handleRename = async (folderId) => {
@@ -48,7 +62,13 @@ const Folders = () => {
 
   const handleDelete = async (folderId, name, e) => {
     e.stopPropagation();
-    if (!window.confirm(`Delete folder "${name}"? Items will be unassigned.`)) return;
+    const ok = await confirm({
+      title: 'Delete Folder',
+      message: `Delete folder "${name}"? Items inside will be unassigned.`,
+      confirmLabel: 'Delete folder',
+      icon: 'fa-folder-minus',
+    });
+    if (!ok) return;
     try {
       await folderAPI.delete(folderId);
       toast.success('Folder deleted');
@@ -62,6 +82,14 @@ const Folders = () => {
 
   return (
     <div>
+      {ConfirmDialog}
+      <AssignItemsModal
+        show={!!assignFolder}
+        folderId={assignFolder?.id}
+        folderName={assignFolder?.name}
+        onClose={() => setAssignFolder(null)}
+        onAssigned={handleAssignAfterCreate}
+      />
       <DashboardPageHeader
         icon="fa-folder"
         title="Folders"
@@ -70,7 +98,7 @@ const Folders = () => {
 
       <form onSubmit={handleCreate} className="folder-create-bar mb-4">
         <i className="fas fa-folder-plus text-primary" />
-        <input className="form-control border-0 bg-transparent" placeholder="New folder name..." value={newName} onChange={(e) => setNewName(e.target.value)} />
+        <input className="form-control border-0 bg-transparent" placeholder="New folder name..." value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={LIMITS.MAX_FOLDER_NAME_LENGTH} />
         <button type="submit" className="btn btn-primary btn-modern btn-sm folder-btn">Create Folder</button>
       </form>
 
@@ -93,7 +121,7 @@ const Folders = () => {
               >
                 {editing === f.id ? (
                   <div className="d-flex gap-2 w-100" onClick={(e) => e.stopPropagation()}>
-                    <input className="form-control form-control-sm" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                    <input className="form-control form-control-sm" value={editName} onChange={(e) => setEditName(e.target.value)} maxLength={LIMITS.MAX_FOLDER_NAME_LENGTH} />
                     <button type="button" className="btn btn-sm btn-primary" onClick={() => handleRename(f.id)}>Save</button>
                     <button type="button" className="btn btn-sm btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
                   </div>

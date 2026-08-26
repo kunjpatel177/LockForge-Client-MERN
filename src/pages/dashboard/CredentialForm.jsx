@@ -4,6 +4,7 @@ import { vaultAPI, folderAPI, securityAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import PasswordInput from '../../components/PasswordInput';
 
 const FormSection = ({ icon, title, children }) => (
   <div className="form-section">
@@ -21,7 +22,6 @@ const CredentialForm = ({ initial = {}, isEdit = false }) => {
   const [searchParams] = useSearchParams();
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [strength, setStrength] = useState(null);
   const [form, setForm] = useState({
     serviceName: '', username: '', email: '', password: '', url: '', notes: '',
@@ -142,15 +142,18 @@ const CredentialForm = ({ initial = {}, isEdit = false }) => {
                 </div>
                 <div className="col-12">
                   <label className="form-label">Password</label>
-                  <div className="input-group">
-                    <input type={showPassword ? 'text' : 'password'} className="form-control form-control-modern" placeholder="Enter or generate a password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-                    <button type="button" className="btn btn-ghost" onClick={() => setShowPassword(!showPassword)} title="Toggle visibility">
-                      <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} />
-                    </button>
-                    <button type="button" className="btn btn-primary btn-modern" onClick={handleGenerate}>
-                      <i className="fas fa-wand-magic-sparkles me-1" />Generate
-                    </button>
-                  </div>
+                  <PasswordInput
+                    useInputGroup
+                    className="form-control form-control-modern"
+                    placeholder="Enter or generate a password"
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    addonAfter={(
+                      <button type="button" className="btn btn-primary btn-modern" onClick={handleGenerate}>
+                        <i className="fas fa-wand-magic-sparkles me-1" />Generate
+                      </button>
+                    )}
+                  />
                   {strength && (
                     <div className="password-strength-bar mt-2">
                       <div className="progress" style={{ height: 4 }}>

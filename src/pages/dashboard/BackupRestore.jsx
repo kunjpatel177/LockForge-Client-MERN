@@ -5,8 +5,11 @@ import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
 import VaultLockedState from '../../components/VaultLockedState';
+import { useConfirm } from '../../hooks/useConfirm';
+import PasswordInput from '../../components/PasswordInput';
 
 const BackupRestore = () => {
+  const { confirm, ConfirmDialog } = useConfirm();
   const { vaultUnlocked } = useOutletContext();
   const [masterPassword, setMasterPassword] = useState('');
   const [backupFile, setBackupFile] = useState(null);
@@ -32,11 +35,19 @@ const BackupRestore = () => {
 
   const handleImport = async () => {
     if (!masterPassword || !backupFile) return toast.error('Enter master password and select backup file');
+    const replace = await confirm({
+      title: 'Replace Vault Data?',
+      message: 'Do you want to replace your existing vault data with this backup? Choose Cancel to merge instead.',
+      confirmLabel: 'Replace all',
+      cancelLabel: 'Merge',
+      variant: 'warning',
+      icon: 'fa-file-import',
+    });
     setLoading(true);
     try {
       const text = await backupFile.text();
       const backup = JSON.parse(text);
-      await backupAPI.importBackup({ masterPassword, backup, replace: window.confirm('Replace existing vault data?') });
+      await backupAPI.importBackup({ masterPassword, backup, replace });
       toast.success('Backup restored');
       setMasterPassword('');
       setBackupFile(null);
@@ -46,7 +57,14 @@ const BackupRestore = () => {
 
   const handlePDF = async () => {
     if (!masterPassword) return toast.error('Enter master password');
-    if (!window.confirm('WARNING: PDF will contain decrypted credentials. Continue?')) return;
+    const ok = await confirm({
+      title: 'Export PDF Warning',
+      message: 'The PDF will contain decrypted credentials and notes organized by folder. Only continue if you understand the security risk.',
+      confirmLabel: 'Export PDF',
+      variant: 'warning',
+      icon: 'fa-file-pdf',
+    });
+    if (!ok) return;
     setLoading(true);
     try {
       const res = await backupAPI.exportPDF(masterPassword);
@@ -66,6 +84,7 @@ const BackupRestore = () => {
 
   return (
     <div>
+      {ConfirmDialog}
       <DashboardPageHeader
         icon="fa-cloud-arrow-up"
         title="Backup & Restore"
@@ -76,14 +95,14 @@ const BackupRestore = () => {
         <div className="dash-panel-body">
           <label className="form-label fw-semibold"><i className="fas fa-lock me-1 text-primary" />Master Password</label>
           <p className="text-muted small mb-2">Required for all backup and restore operations.</p>
-          <input
-            type="password"
-            className="form-control form-control-modern"
-            style={{ maxWidth: 400 }}
-            placeholder="Enter your master password"
-            value={masterPassword}
-            onChange={(e) => setMasterPassword(e.target.value)}
-          />
+          <div style={{ maxWidth: 400 }}>
+            <PasswordInput
+              className="form-control form-control-modern"
+              placeholder="Enter your master password"
+              value={masterPassword}
+              onChange={(e) => setMasterPassword(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
@@ -113,7 +132,7 @@ const BackupRestore = () => {
           <div className="backup-card">
             <div className="backup-card-icon pdf"><i className="fas fa-file-pdf" /></div>
             <h5 className="fw-bold mb-2">PDF Export</h5>
-            <p className="text-muted small text-danger">Contains decrypted credentials. Handle with extreme care.</p>
+            <p className="text-muted small text-danger">Folder-wise export of credentials and secure notes. Handle with extreme care.</p>
             <button type="button" className="btn btn-outline-danger btn-modern" onClick={handlePDF} disabled={loading}>
               <i className="fas fa-file-pdf me-1" />Export PDF
             </button>

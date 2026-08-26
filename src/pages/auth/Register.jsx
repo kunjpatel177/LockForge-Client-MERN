@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
+import PasswordInput from '../../components/PasswordInput';
 
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', masterPassword: '', confirmPassword: '', confirmMaster: '' });
@@ -50,12 +51,12 @@ const Register = () => {
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Account Password</label>
-                    <input type="password" className="form-control" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+                    <PasswordInput className="form-control" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
                     <small className="text-muted">Min 8 chars, uppercase, lowercase, number, special char</small>
                   </div>
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Confirm Password</label>
-                    <input type="password" className="form-control" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} required />
+                    <PasswordInput className="form-control" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} required />
                   </div>
                 </div>
                 <div className="alert alert-info small">
@@ -65,11 +66,11 @@ const Register = () => {
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Master Password</label>
-                    <input type="password" className="form-control" value={form.masterPassword} onChange={(e) => setForm({ ...form, masterPassword: e.target.value })} required />
+                    <PasswordInput className="form-control" value={form.masterPassword} onChange={(e) => setForm({ ...form, masterPassword: e.target.value })} required />
                   </div>
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Confirm Master Password</label>
-                    <input type="password" className="form-control" value={form.confirmMaster} onChange={(e) => setForm({ ...form, confirmMaster: e.target.value })} required />
+                    <PasswordInput className="form-control" value={form.confirmMaster} onChange={(e) => setForm({ ...form, confirmMaster: e.target.value })} required />
                   </div>
                 </div>
                 <button type="submit" className="btn btn-primary w-100" disabled={loading}>

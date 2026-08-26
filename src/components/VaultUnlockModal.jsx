@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { handleApiError } from '../api/axios';
 import { toast } from 'react-toastify';
+import PasswordInput from './PasswordInput';
 
 const VaultUnlockModal = ({ show, onClose, onUnlock }) => {
   const { unlockVault } = useAuth();
@@ -40,8 +41,7 @@ const VaultUnlockModal = ({ show, onClose, onUnlock }) => {
               <p className="text-muted">Enter your master password to access your vault.</p>
               <div className="mb-3">
                 <label className="form-label">Master Password</label>
-                <input
-                  type="password"
+                <PasswordInput
                   className="form-control"
                   value={masterPassword}
                   onChange={(e) => setMasterPassword(e.target.value)}

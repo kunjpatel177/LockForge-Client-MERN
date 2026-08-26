@@ -7,8 +7,10 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
 import VaultLockedState from '../../components/VaultLockedState';
 import EmptyState from '../../components/EmptyState';
+import { useConfirm } from '../../hooks/useConfirm';
 
 const Trash = () => {
+  const { confirm, ConfirmDialog } = useConfirm();
   const { vaultUnlocked } = useOutletContext();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,13 @@ const Trash = () => {
   };
 
   const handlePermanentDelete = async (id) => {
-    if (!window.confirm('Permanently delete? This cannot be undone.')) return;
+    const ok = await confirm({
+      title: 'Permanently Delete',
+      message: 'This credential will be permanently deleted. This cannot be undone.',
+      confirmLabel: 'Delete forever',
+      icon: 'fa-trash',
+    });
+    if (!ok) return;
     try {
       await vaultAPI.permanentDelete(id);
       toast.success('Permanently deleted');
@@ -42,7 +50,13 @@ const Trash = () => {
   };
 
   const handleEmptyTrash = async () => {
-    if (!window.confirm('Empty trash? All items will be permanently deleted.')) return;
+    const ok = await confirm({
+      title: 'Empty Trash',
+      message: 'All items in trash will be permanently deleted. This cannot be undone.',
+      confirmLabel: 'Empty trash',
+      icon: 'fa-trash',
+    });
+    if (!ok) return;
     try {
       await vaultAPI.emptyTrash();
       toast.success('Trash emptied');
@@ -55,6 +69,7 @@ const Trash = () => {
 
   return (
     <div>
+      {ConfirmDialog}
       <DashboardPageHeader
         icon="fa-trash"
         title="Trash"

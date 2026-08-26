@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import PasswordInput from '../../components/PasswordInput';
 import { useAuth } from '../../context/AuthContext';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
@@ -43,7 +44,12 @@ const Login = () => {
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Password</label>
-                  <input type="password" className="form-control" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+                  <PasswordInput
+                    className="form-control"
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    required
+                  />
                 </div>
                 <div className="d-flex justify-content-between mb-3">
                   <Link to="/forgot-password" className="text-decoration-none small">Forgot password?</Link>

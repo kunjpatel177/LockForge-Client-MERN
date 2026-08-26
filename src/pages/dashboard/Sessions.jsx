@@ -5,8 +5,10 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
 import EmptyState from '../../components/EmptyState';
+import { useConfirm } from '../../hooks/useConfirm';
 
 const Sessions = () => {
+  const { confirm, ConfirmDialog } = useConfirm();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,7 +23,13 @@ const Sessions = () => {
   useEffect(() => { load(); }, []);
 
   const handleRevoke = async (id) => {
-    if (!window.confirm('Revoke this session?')) return;
+    const ok = await confirm({
+      title: 'Revoke Session',
+      message: 'This device will be signed out immediately. Continue?',
+      confirmLabel: 'Revoke',
+      icon: 'fa-right-from-bracket',
+    });
+    if (!ok) return;
     try {
       await sessionAPI.revoke(id);
       toast.success('Session revoked');
@@ -30,7 +38,13 @@ const Sessions = () => {
   };
 
   const handleRevokeAll = async () => {
-    if (!window.confirm('Revoke all other sessions?')) return;
+    const ok = await confirm({
+      title: 'Logout All Other Devices',
+      message: 'All sessions except this one will be signed out. Continue?',
+      confirmLabel: 'Logout all',
+      icon: 'fa-right-from-bracket',
+    });
+    if (!ok) return;
     try {
       await sessionAPI.revokeAll();
       toast.success('All other sessions revoked');
@@ -42,6 +56,7 @@ const Sessions = () => {
 
   return (
     <div>
+      {ConfirmDialog}
       <DashboardPageHeader
         icon="fa-desktop"
         title="Active Sessions"

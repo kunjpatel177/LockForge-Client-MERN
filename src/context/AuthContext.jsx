@@ -118,6 +118,15 @@ export const AuthProvider = ({ children }) => {
     setVaultUnlocked(false);
   };
 
+  const destroyAuth = useCallback(() => {
+    authCheckRef.current += 1;
+    navigate('/', { replace: true });
+    clearStoredTokens();
+    setUser(null);
+    setStats(null);
+    setVaultUnlocked(false);
+  }, [navigate]);
+
   const unlockVault = async (masterPassword) => {
     await authAPI.unlockVault(masterPassword);
     setVaultUnlocked(true);
@@ -136,7 +145,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, stats, loading, vaultUnlocked, login, register, logout, endSession,
+      user, stats, loading, vaultUnlocked, login, register, logout, endSession, destroyAuth,
       unlockVault, lockVault, refreshProfile, checkAuth, isAuthenticated: !!user,
     }}>
       {children}

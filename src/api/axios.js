@@ -50,7 +50,16 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-const AUTH_SKIP_REFRESH = ['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout'];
+const AUTH_SKIP_REFRESH = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/refresh',
+  '/auth/logout',
+  '/users/account',
+  '/users/change-password',
+  '/users/change-master-password',
+  '/auth/unlock-vault',
+];
 
 const endStoredSession = () => {
   const hadAuth = hadStoredAuth();

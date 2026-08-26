@@ -4,6 +4,7 @@ import { userAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
+import PasswordInput from '../../components/PasswordInput';
 
 const ChangeMasterPassword = () => {
   const [form, setForm] = useState({ currentMasterPassword: '', newMasterPassword: '', confirm: '' });
@@ -52,15 +53,15 @@ const ChangeMasterPassword = () => {
         <form onSubmit={handleSubmit} className="settings-card-body">
           <div className="mb-3">
             <label className="form-label">Current Master Password</label>
-            <input type="password" className="form-control form-control-modern" value={form.currentMasterPassword} onChange={(e) => setForm({ ...form, currentMasterPassword: e.target.value })} required />
+            <PasswordInput className="form-control form-control-modern" value={form.currentMasterPassword} onChange={(e) => setForm({ ...form, currentMasterPassword: e.target.value })} required />
           </div>
           <div className="mb-3">
             <label className="form-label">New Master Password</label>
-            <input type="password" className="form-control form-control-modern" value={form.newMasterPassword} onChange={(e) => setForm({ ...form, newMasterPassword: e.target.value })} required />
+            <PasswordInput className="form-control form-control-modern" value={form.newMasterPassword} onChange={(e) => setForm({ ...form, newMasterPassword: e.target.value })} required />
           </div>
           <div className="mb-3">
             <label className="form-label">Confirm New Master Password</label>
-            <input type="password" className="form-control form-control-modern" value={form.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} required />
+            <PasswordInput className="form-control form-control-modern" value={form.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} required />
           </div>
           <button type="submit" className="btn btn-primary btn-modern" disabled={loading}>
             {loading ? 'Changing...' : 'Change Master Password'}

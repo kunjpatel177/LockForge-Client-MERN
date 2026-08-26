@@ -27,6 +27,7 @@ export const vaultAPI = {
   getOne: (id) => api.get(`/vault/${id}`),
   create: (data) => api.post('/vault', data),
   update: (id, data) => api.put(`/vault/${id}`, data),
+  moveToFolder: (id, folderId) => api.patch(`/vault/${id}/folder`, { folderId }),
   delete: (id) => api.delete(`/vault/${id}`),
   restore: (id) => api.post(`/vault/${id}/restore`),
   permanentDelete: (id) => api.delete(`/vault/${id}/permanent`),
@@ -39,6 +40,7 @@ export const folderAPI = {
   getOne: (id) => api.get(`/folders/${id}`),
   create: (name) => api.post('/folders', { name }),
   update: (id, name) => api.put(`/folders/${id}`, { name }),
+  assignItems: (id, data) => api.post(`/folders/${id}/assign`, data),
   delete: (id) => api.delete(`/folders/${id}`),
 };
 
@@ -47,6 +49,7 @@ export const noteAPI = {
   getOne: (id) => api.get(`/notes/${id}`),
   create: (data) => api.post('/notes', data),
   update: (id, data) => api.put(`/notes/${id}`, data),
+  moveToFolder: (id, folderId) => api.patch(`/notes/${id}/folder`, { folderId }),
   delete: (id) => api.delete(`/notes/${id}`),
 };
 

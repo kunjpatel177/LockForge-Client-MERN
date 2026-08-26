@@ -6,12 +6,17 @@ import { userAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
+import ConfirmModal from '../../components/ConfirmModal';
+import PasswordInput from '../../components/PasswordInput';
 
 const Settings = () => {
-  const { user, refreshProfile } = useAuth();
+  const { user, refreshProfile, destroyAuth } = useAuth();
   const { theme, setTheme } = useTheme();
   const [autoLock, setAutoLock] = useState(user?.settings?.autoLockMinutes || 15);
   const [saving, setSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
@@ -21,6 +26,29 @@ const Settings = () => {
       toast.success('Settings saved');
     } catch (err) { toast.error(handleApiError(err).message); }
     finally { setSaving(false); }
+  };
+
+  const closeDeleteModal = () => {
+    if (deleting) return;
+    setShowDeleteModal(false);
+    setDeletePassword('');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      toast.error('Enter your password to confirm');
+      return;
+    }
+    setDeleting(true);
+    try {
+      await userAPI.deleteAccount(deletePassword);
+      toast.success('Your account has been permanently deleted');
+      destroyAuth();
+    } catch (err) {
+      toast.error(handleApiError(err).message);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -85,7 +113,57 @@ const Settings = () => {
             </div>
           </div>
         </div>
+
+        <div className="col-12">
+          <div className="settings-card danger-zone-card">
+            <div className="settings-card-header">
+              <div className="settings-card-icon danger"><i className="fas fa-triangle-exclamation" /></div>
+              <div>
+                <h5 className="fw-bold mb-0 text-danger">Danger Zone</h5>
+                <small className="text-muted">Irreversible account actions</small>
+              </div>
+            </div>
+            <div className="settings-card-body">
+              <p className="text-muted mb-3">
+                Permanently delete your account and all vault data, folders, notes, sessions, and activity logs.
+                This action cannot be undone.
+              </p>
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-modern"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                <i className="fas fa-user-xmark me-2" />Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <ConfirmModal
+        show={showDeleteModal}
+        title="Delete Account"
+        message="Enter your account password to permanently delete your LockForge account and all associated data."
+        confirmLabel="Delete my account"
+        variant="danger"
+        icon="fa-user-xmark"
+        loading={deleting}
+        onClose={closeDeleteModal}
+        onConfirm={handleDeleteAccount}
+      >
+        <div className="mb-0">
+          <label className="form-label" htmlFor="delete-account-password">Account Password</label>
+          <PasswordInput
+            id="delete-account-password"
+            className="form-control form-control-modern"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            placeholder="Enter your password"
+            autoFocus
+            required
+          />
+        </div>
+      </ConfirmModal>
     </div>
   );
 };

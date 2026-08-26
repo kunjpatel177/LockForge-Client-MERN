@@ -4,6 +4,7 @@ import { userAPI, authAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
+import PasswordInput from '../../components/PasswordInput';
 
 const Profile = () => {
   const { user, refreshProfile } = useAuth();
@@ -107,15 +108,15 @@ const Profile = () => {
             <form onSubmit={handlePasswordChange} className="settings-card-body">
               <div className="mb-3">
                 <label className="form-label">Current Password</label>
-                <input type="password" className="form-control form-control-modern" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+                <PasswordInput className="form-control form-control-modern" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
               </div>
               <div className="mb-3">
                 <label className="form-label">New Password</label>
-                <input type="password" className="form-control form-control-modern" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                <PasswordInput className="form-control form-control-modern" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
               </div>
               <div className="mb-3">
                 <label className="form-label">Confirm Password</label>
-                <input type="password" className="form-control form-control-modern" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                <PasswordInput className="form-control form-control-modern" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
               </div>
               <button type="submit" className="btn btn-primary btn-modern" disabled={loading}>Change Password</button>
             </form>

@@ -3,6 +3,7 @@ import { securityAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
+import PasswordReveal from '../../components/PasswordReveal';
 
 const PasswordGenerator = () => {
   const [options, setOptions] = useState({
@@ -74,7 +75,11 @@ const PasswordGenerator = () => {
             {password ? (
               <>
                 <div className="generator-output-box">
-                  <code className="fs-5 word-break">{password}</code>
+                  <PasswordReveal
+                    value={password}
+                    buttonClassName="btn btn-ghost btn-sm"
+                    codeClassName="fs-5 word-break"
+                  />
                 </div>
                 {strength && (
                   <div className="mb-3">
