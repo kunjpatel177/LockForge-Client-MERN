@@ -26,6 +26,7 @@ const navSections = [
       { to: '/activity', icon: 'fa-clock-rotate-left', label: 'Activity Logs' },
       { to: '/backup', icon: 'fa-cloud-arrow-up', label: 'Backup & Restore' },
       { to: '/trash', icon: 'fa-trash', label: 'Trash' },
+      { to: '/profile', icon: 'fa-user', label: 'Profile' },
       { to: '/settings', icon: 'fa-cog', label: 'Settings' },
     ],
   },

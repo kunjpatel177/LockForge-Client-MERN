@@ -49,21 +49,21 @@ const Register = () => {
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Full Name</label>
-                  <input type="text" className="form-control" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                  <input type="text" className="form-control" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Enter your full name" required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Email</label>
-                  <input type="email" className="form-control" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                  <input type="email" className="form-control" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Enter your email" required />
                 </div>
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Account Password</label>
-                    <PasswordInput className="form-control" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+                    <PasswordInput className="form-control" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Enter your password" required />
                     <small className="text-muted">Min 8 chars, uppercase, lowercase, number, special char</small>
                   </div>
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Confirm Password</label>
-                    <PasswordInput className="form-control" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} required />
+                    <PasswordInput className="form-control" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} placeholder="Confirm your password" required />
                   </div>
                 </div>
                 <div className="alert alert-info small">
@@ -73,11 +73,11 @@ const Register = () => {
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Master Password</label>
-                    <PasswordInput className="form-control" value={form.masterPassword} onChange={(e) => setForm({ ...form, masterPassword: e.target.value })} required />
+                    <PasswordInput className="form-control" value={form.masterPassword} onChange={(e) => setForm({ ...form, masterPassword: e.target.value })} placeholder="Enter master password" required />
                   </div>
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Confirm Master Password</label>
-                    <PasswordInput className="form-control" value={form.confirmMaster} onChange={(e) => setForm({ ...form, confirmMaster: e.target.value })} required />
+                    <PasswordInput className="form-control" value={form.confirmMaster} onChange={(e) => setForm({ ...form, confirmMaster: e.target.value })} placeholder="Confirm master password" required />
                   </div>
                 </div>
                 <button type="submit" className="btn btn-primary w-100" disabled={loading}>

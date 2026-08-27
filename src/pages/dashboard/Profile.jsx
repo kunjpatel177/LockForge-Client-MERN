@@ -196,15 +196,15 @@ const Profile = () => {
             <form onSubmit={handlePasswordChange} className="settings-card-body">
               <div className="mb-3">
                 <label className="form-label">Current Password</label>
-                <PasswordInput className="form-control form-control-modern" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+                <PasswordInput className="form-control form-control-modern" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder={"Enter your current password"} />
               </div>
               <div className="mb-3">
                 <label className="form-label">New Password</label>
-                <PasswordInput className="form-control form-control-modern" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                <PasswordInput className="form-control form-control-modern" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={"Enter your new password"} />
               </div>
               <div className="mb-3">
                 <label className="form-label">Confirm Password</label>
-                <PasswordInput className="form-control form-control-modern" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                <PasswordInput className="form-control form-control-modern" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder={"Confirm your new password"} />
               </div>
               <button type="submit" className="btn btn-primary btn-modern" disabled={loading}>Change Password</button>
             </form>

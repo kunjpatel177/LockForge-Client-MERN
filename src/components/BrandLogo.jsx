@@ -11,7 +11,8 @@ const BrandLogo = ({ size = 'sm', className = '', alt = 'LockForge logo' }) => {
 
   return (
     <img
-      src="/android-chrome-512x512.png"
+      src="/LockForge_light.svg"
+      // src="/android-chrome-512x512.png"
       alt={alt}
       width={px}
       height={px}

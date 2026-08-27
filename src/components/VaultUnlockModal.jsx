@@ -45,6 +45,7 @@ const VaultUnlockModal = ({ show, onClose, onUnlock }) => {
                   className="form-control"
                   value={masterPassword}
                   onChange={(e) => setMasterPassword(e.target.value)}
+                  placeholder="Enter your master password"
                   required
                   autoFocus
                 />

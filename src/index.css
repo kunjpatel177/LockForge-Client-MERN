@@ -11,7 +11,8 @@
   --text-muted: #94a3b8;
   --border-color: #e2e8f0;
   --navbar-bg: rgba(255, 255, 255, 0.7);
-  --sidebar-bg: #0f172a;
+  --sidebar-bg: #010714;
+  /* --sidebar-bg: #0f172a; */
   --sidebar-text: #94a3b8;
   --sidebar-active: #f8fafc;
   --hero-bg: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f0f9ff 100%);
@@ -33,9 +34,11 @@
 [data-theme="dark"] {
   --bg-primary: #0b0f1a;
   --bg-secondary: #111827;
-  --bg-card: #1a2236;
+  /* --bg-card: #1a2236; */
+  --bg-card: #121724;
   --bg-alt: #0f1525;
-  --text-primary: #f1f5f9;
+  --text-primary: #d3d5d5;
+  /* --text-primary: #f1f5f9; */
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --border-color: #1e293b;
@@ -120,7 +123,6 @@ a:hover {
   width: 100%;
   background: var(--navbar-bg) !important;
   backdrop-filter: blur(20px) !important;
-  /* -webkit-backdrop-filter: blur(20px) !important; */
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
 }
@@ -149,14 +151,14 @@ a:hover {
 
 .navbar-pro-brand {
   display: inline-flex;
-  align-items: center;
   gap: 0.65rem;
   font-weight: 800;
   font-size: 1.2rem;
   color: var(--text-primary) !important;
   text-decoration: none;
-  flex-shrink: 0;
   letter-spacing: -0.02em;
+  flex-shrink: 0;
+  align-items: center;
 }
 
 .navbar-pro-brand:hover {
@@ -460,19 +462,43 @@ a:hover {
 
 @media (max-width: 991px) {
   .navbar-pro-container {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: var(--navbar-height) auto;
     align-items: center;
-    min-height: 60px;
+    min-height: var(--navbar-height);
+    column-gap: 1rem;
+    row-gap: 0;
+  }
+
+  .navbar-pro-brand {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .navbar-pro-toggle {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
   }
 
   .navbar-pro-collapse {
+    grid-column: 1 / -1;
+    grid-row: 2;
     flex-direction: column;
     align-items: stretch;
     width: 100%;
     gap: 0;
     padding: 0.75rem 0 1rem;
     border-top: 1px solid var(--border-color);
-    margin-top: 0.25rem;
+    margin-top: 0;
+  }
+
+  .navbar-pro-collapse:not(.show) {
+    border-top-color: transparent;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .navbar-pro-nav {
@@ -1539,7 +1565,8 @@ a:hover {
 
 .sidebar-link:hover {
   color: var(--sidebar-active);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.070);
+  /* background: rgba(255, 255, 255, 0.05); */
 }
 
 .sidebar-link.active {
