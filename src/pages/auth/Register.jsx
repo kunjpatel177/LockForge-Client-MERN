@@ -66,7 +66,7 @@ const Register = () => {
                     <PasswordInput className="form-control" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} placeholder="Confirm your password" required />
                   </div>
                 </div>
-                <div className="alert alert-info small">
+                <div className="alert alert-danger small">
                   <i className="fas fa-info-circle me-1" />
                   Your <strong>master password</strong> encrypts your vault. It cannot be recovered if lost.
                 </div>
