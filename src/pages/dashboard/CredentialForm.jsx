@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useOutletContext, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams, useSearchParams, Link } from 'react-router-dom';
 import { vaultAPI, folderAPI, securityAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
@@ -88,10 +88,15 @@ const CredentialForm = ({ initial = {}, isEdit = false }) => {
 
   return (
     <div className="credential-form-page">
-      <div className="d-flex align-items-center gap-2 mb-4">
+      {/* <div className="d-flex align-items-center gap-2 mb-4">
         <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate(-1)}>
           <i className="fas fa-arrow-left me-1" />Back
         </button>
+      </div> */}
+
+      <div className="dash-breadcrumb mb-3">
+        <Link to="/vault"><i className="fas fa-arrow-left me-1" />Back to Vault</Link>
+        {/* <Link to="/vault" className="btn btn-primary btn-sm"><i className="fas fa-arrow-left me-1" />Back to Vault</Link> */}
       </div>
 
       <div className="credential-form-header mb-4">

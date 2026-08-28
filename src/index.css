@@ -2180,15 +2180,23 @@ a:hover {
 
 .dash-breadcrumb {
   font-size: 0.85rem;
+  display: inline-flex;
+  background: var(--gradient);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: all 0.25s;
 }
 
 .dash-breadcrumb a {
-  color: var(--text-muted);
+  padding: 0.4rem 0.7rem;
+  /* color: var(--text-muted); */
+  color: var(--bg-primary);
   text-decoration: none;
 }
 
-.dash-breadcrumb a:hover {
-  color: var(--primary);
+.dash-breadcrumb:hover {
+  /* color: var(--primary); */
+  transform: translateY(-1px);
 }
 
 .vault-locked-state {

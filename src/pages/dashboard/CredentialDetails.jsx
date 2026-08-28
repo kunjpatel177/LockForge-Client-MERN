@@ -56,6 +56,7 @@ const CredentialDetails = () => {
       {ConfirmDialog}
       <div className="dash-breadcrumb mb-3">
         <Link to="/vault"><i className="fas fa-arrow-left me-1" />Back to Vault</Link>
+        {/* <Link to="/vault" className="btn btn-primary btn-sm"><i className="fas fa-arrow-left me-1" />Back to Vault</Link> */}
       </div>
 
       <div className="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
