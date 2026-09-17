@@ -6,9 +6,35 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
 import EmptyState from '../../components/EmptyState';
 
+const actionLabels = {
+  login: 'Login',
+  logout: 'Logout',
+  failed_login: 'Failed login',
+  credential_created: 'Credential created',
+  credential_updated: 'Credential updated',
+  credential_deleted: 'Credential deleted',
+  credential_restored: 'Credential restored',
+  credential_permanently_deleted: 'Credential deleted permanently',
+  export: 'Export',
+  backup: 'Backup',
+  restore: 'Restore',
+  password_changed: 'Password changed',
+  master_password_changed: 'Master password changed',
+  session_revoked: 'Session revoked',
+  note_created: 'Note created',
+  note_updated: 'Note updated',
+  note_deleted: 'Note deleted',
+  folder_created: 'Folder created',
+  folder_updated: 'Folder updated',
+  folder_deleted: 'Folder deleted',
+  trash_emptied: 'Trash emptied',
+  settings_updated: 'Settings updated',
+  email_changed: 'Email changed',
+};
+
 const ActivityLogs = () => {
   const [logs, setLogs] = useState([]);
-  const [pagination, setPagination] = useState({ page: 1, total: 0 });
+  const [pagination, setPagination] = useState({ page: 1, total: 0, limit: 20 });
   const [loading, setLoading] = useState(true);
 
   const load = async (page = 1) => {
@@ -23,15 +49,6 @@ const ActivityLogs = () => {
 
   useEffect(() => { load(); }, []);
 
-  const actionIcons = {
-    login: 'fa-right-to-bracket text-success',
-    logout: 'fa-right-from-bracket',
-    failed_login: 'fa-triangle-exclamation text-danger',
-    credential_created: 'fa-plus text-primary',
-    credential_updated: 'fa-pen text-info',
-    credential_deleted: 'fa-trash text-warning',
-  };
-
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -39,38 +56,46 @@ const ActivityLogs = () => {
       <DashboardPageHeader
         icon="fa-clock-rotate-left"
         title="Activity Logs"
-        subtitle="Review account actions and security events"
+        subtitle="Review account actions, IP addresses, and approximate locations"
       />
 
       {logs.length === 0 ? (
         <EmptyState icon="fa-clock-rotate-left" title="No activity yet" description="Your account activity will be recorded here." />
       ) : (
         <>
-          <div className="dash-panel">
-            <div className="dash-panel-body p-0">
-              <div className="activity-timeline px-3">
+          <div className="modern-table-wrap">
+            <table className="table table-hover mb-0 activity-history-table">
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>Details</th>
+                  <th>IP Address</th>
+                  <th>Location</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody>
                 {logs.map((log) => (
-                  <div key={log._id} className="activity-item">
-                    <div className="activity-dot">
-                      <i className={`fas ${actionIcons[log.action] || 'fa-circle'}`} />
-                    </div>
-                    <div className="activity-content">
-                      <div className="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-                        <div>
-                          <span className="activity-action">{log.action.replace(/_/g, ' ')}</span>
-                          {log.description && <p className="text-muted small mb-0 mt-1">{log.description}</p>}
-                          <small className="text-muted">IP: {log.ipAddress}</small>
-                        </div>
-                        <span className="activity-time">{new Date(log.createdAt).toLocaleString()}</span>
-                      </div>
-                    </div>
-                  </div>
+                  <tr key={log._id}>
+                    <td>
+                      <span className="activity-action text-capitalize">
+                        {actionLabels[log.action] || log.action.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td className="text-muted small">{log.description || '—'}</td>
+                    <td><code className="small">{log.ipAddress || 'Unknown'}</code></td>
+                    <td className="text-muted small">
+                      <i className="fas fa-location-dot me-1 text-primary" />
+                      {log.location || 'Unknown location'}
+                    </td>
+                    <td className="text-muted small text-nowrap">{new Date(log.createdAt).toLocaleString()}</td>
+                  </tr>
                 ))}
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
 
-          {pagination.total > 20 && (
+          {pagination.total > pagination.limit && (
             <div className="d-flex justify-content-center align-items-center gap-3 mt-4">
               <button type="button" className="btn btn-sm btn-ghost" disabled={pagination.page <= 1} onClick={() => load(pagination.page - 1)}>
                 <i className="fas fa-chevron-left me-1" />Previous

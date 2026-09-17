@@ -1900,6 +1900,10 @@ a:hover {
   color: var(--primary);
 }
 
+[data-theme="dark"] .owner-tagline{
+  color: var(--primary);
+}
+
 .text-primary {
   color: var(--primary) !important;
 }
@@ -3947,6 +3951,7 @@ body {
 
   .owner-name {
     font-size: 1.4rem;
+    text-align: center;
   }
 
   .col-6.col-md-3 {

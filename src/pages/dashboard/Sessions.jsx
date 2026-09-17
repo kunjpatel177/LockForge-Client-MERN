@@ -60,7 +60,7 @@ const Sessions = () => {
       <DashboardPageHeader
         icon="fa-desktop"
         title="Active Sessions"
-        subtitle="Manage devices where your account is signed in"
+        subtitle="Manage signed-in devices with IP addresses and approximate locations"
         actions={
           sessions.length > 1 && (
             <button type="button" className="btn btn-outline-danger btn-modern btn-sm" onClick={handleRevokeAll}>
@@ -80,6 +80,7 @@ const Sessions = () => {
                 <th>Device</th>
                 <th>Browser</th>
                 <th>IP Address</th>
+                <th>Location</th>
                 <th>Last Active</th>
                 <th>Login</th>
                 <th />
@@ -97,6 +98,10 @@ const Sessions = () => {
                   </td>
                   <td className="text-muted">{s.browser}</td>
                   <td><code className="small">{s.ipAddress}</code></td>
+                  <td className="text-muted small">
+                    <i className="fas fa-location-dot me-1 text-primary" />
+                    {s.location || 'Unknown location'}
+                  </td>
                   <td className="text-muted small">{new Date(s.lastActive).toLocaleString()}</td>
                   <td className="text-muted small">{new Date(s.createdAt).toLocaleString()}</td>
                   <td className="text-end">
