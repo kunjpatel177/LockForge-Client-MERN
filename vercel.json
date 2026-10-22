@@ -5,6 +5,10 @@
       "destination": "https://lockforgekmpserver.vercel.app/api/:path*"
     },
     {
+      "source": "/api/:path*",
+      "destination": "https://lockforgepwmserver.vercel.app/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
