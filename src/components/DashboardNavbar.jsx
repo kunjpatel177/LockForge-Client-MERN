@@ -243,6 +243,10 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
                   <i className="fas fa-vault dropdown-icon" />
                   <span>Vault Credentials</span>
                 </Link>
+                <Link className="dropdown-item" to="/hidden">
+                  <i className="fas fa-eye-slash dropdown-icon text-secondary" />
+                  <span>Hidden Items</span>
+                </Link>
                 <Link className="dropdown-item" to="/security-dashboard">
                   <i className="fas fa-shield-halved dropdown-icon text-info" />
                   <span>Security Health</span>

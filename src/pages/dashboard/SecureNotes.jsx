@@ -97,6 +97,25 @@ const SecureNotes = () => {
     } catch (err) { showApiError(err); }
   };
 
+  const handleHide = async (id, title) => {
+    const ok = await confirm({
+      title: 'Hide Secure Note',
+      message: `Hide note "${title}"? It will be removed from your standard notes and will require your Master Password to access in Hidden Items.`,
+      confirmLabel: 'Hide Note',
+      variant: 'primary',
+      icon: 'fa-eye-slash',
+    });
+    if (!ok) return;
+
+    try {
+      await noteAPI.toggleHide(id);
+      toast.success(`Note "${title}" is now hidden`);
+      load();
+    } catch (err) {
+      showApiError(err);
+    }
+  };
+
   const handleMove = async (folderId) => {
     if (!moveItem) return;
     await noteAPI.moveToFolder(moveItem.id, folderId);
@@ -223,6 +242,14 @@ const SecureNotes = () => {
                     {n.isFavorite && <i className="fas fa-star text-warning ms-2" style={{ fontSize: '0.85rem' }} />}
                   </h5>
                   <div className="d-flex gap-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      className="dash-action-btn"
+                      title="Hide note (protect with Master Password)"
+                      onClick={() => handleHide(n.id, n.title)}
+                    >
+                      <i className="fas fa-eye-slash" />
+                    </button>
                     <button type="button" className="dash-action-btn" title="Move to folder" onClick={() => setMoveItem({ id: n.id, name: n.title, folderId: n.folderId })}>
                       <i className="fas fa-folder-open" />
                     </button>

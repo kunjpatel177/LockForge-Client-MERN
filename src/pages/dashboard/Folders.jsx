@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { folderAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
@@ -76,6 +76,26 @@ const Folders = () => {
     } catch (err) { toast.error(handleApiError(err).message); }
   };
 
+  const handleHideFolder = async (folderId, name, e) => {
+    e.stopPropagation();
+    const ok = await confirm({
+      title: 'Hide Folder',
+      message: `Hide folder "${name}"? It and its contents will be hidden from the standard folders view and will require your Master Password to access in Hidden Items.`,
+      confirmLabel: 'Hide Folder',
+      variant: 'primary',
+      icon: 'fa-eye-slash',
+    });
+    if (!ok) return;
+
+    try {
+      await folderAPI.toggleHide(folderId);
+      toast.success(`Folder "${name}" is now hidden`);
+      load();
+    } catch (err) {
+      toast.error(handleApiError(err).message);
+    }
+  };
+
   const openFolder = (folderId) => navigate(`/folders/${folderId}`);
 
   if (loading) return <LoadingSpinner />;
@@ -120,32 +140,75 @@ const Folders = () => {
                 tabIndex={0}
               >
                 {editing === f.id ? (
-                  <div className="d-flex gap-2 w-100" onClick={(e) => e.stopPropagation()}>
-                    <input className="form-control form-control-sm" value={editName} onChange={(e) => setEditName(e.target.value)} maxLength={LIMITS.MAX_FOLDER_NAME_LENGTH} />
-                    <button type="button" className="btn btn-sm btn-primary" onClick={() => handleRename(f.id)}>Save</button>
-                    <button type="button" className="btn btn-sm btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
+                  <div className="folder-edit-box" onClick={(e) => e.stopPropagation()}>
+                    <label className="form-label small fw-semibold text-muted mb-1">Rename Folder</label>
+                    <input
+                      className="form-control form-control-sm form-control-modern"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      maxLength={LIMITS.MAX_FOLDER_NAME_LENGTH}
+                      autoFocus
+                    />
+                    <div className="d-flex gap-2 mt-2">
+                      <button type="button" className="btn btn-sm btn-primary btn-modern flex-grow-1" onClick={() => handleRename(f.id)}>Save</button>
+                      <button type="button" className="btn btn-sm btn-ghost btn-modern" onClick={() => setEditing(null)}>Cancel</button>
+                    </div>
                   </div>
                 ) : (
                   <>
-                    <div className="folder-card-icon"><i className="fas fa-folder" /></div>
-                    <div className="folder-card-body">
-                      <h5 className="folder-card-title">{f.name}</h5>
-                      <div className="folder-card-meta">
-                        <span><i className="fas fa-key me-1" />{f.credentialCount} credentials</span>
-                        <span><i className="fas fa-sticky-note me-1" />{f.noteCount || 0} notes</span>
+                    <div className="folder-card-top">
+                      <div className="folder-card-icon">
+                        <i className="fas fa-folder" />
+                      </div>
+                      <div className="folder-card-actions" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          className="dash-action-btn"
+                          title="Hide folder (protect with Master Password)"
+                          onClick={(e) => handleHideFolder(f.id, f.name, e)}
+                        >
+                          <i className="fas fa-eye-slash" />
+                        </button>
+                        <button
+                          type="button"
+                          className="dash-action-btn"
+                          title="Rename"
+                          onClick={() => { setEditing(f.id); setEditName(f.name); }}
+                        >
+                          <i className="fas fa-pen" />
+                        </button>
+                        {!f.isDefault && (
+                          <button
+                            type="button"
+                            className="dash-action-btn danger"
+                            title="Delete folder"
+                            onClick={(e) => handleDelete(f.id, f.name, e)}
+                          >
+                            <i className="fas fa-trash" />
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <div className="folder-card-actions" onClick={(e) => e.stopPropagation()}>
-                      <button type="button" className="dash-action-btn" title="Rename" onClick={() => { setEditing(f.id); setEditName(f.name); }}>
-                        <i className="fas fa-pen" />
-                      </button>
-                      {!f.isDefault && (
-                        <button type="button" className="dash-action-btn danger" title="Delete" onClick={(e) => handleDelete(f.id, f.name, e)}>
-                          <i className="fas fa-trash" />
-                        </button>
-                      )}
+
+                    <div className="folder-card-main">
+                      <h5 className="folder-card-title mb-0">{f.name}</h5>
                     </div>
-                    <div className="folder-card-arrow"><i className="fas fa-chevron-right" /></div>
+
+                    <div className="folder-card-footer">
+                      <div className="folder-card-meta">
+                        <span className="folder-meta-item">
+                          <i className="fas fa-key me-1 text-primary" />
+                          {f.credentialCount} {f.credentialCount === 1 ? 'credential' : 'credentials'}
+                        </span>
+                        <span className="folder-meta-item">
+                          <i className="fas fa-sticky-note me-1 text-warning" />
+                          {f.noteCount || 0} {f.noteCount === 1 ? 'note' : 'notes'}
+                        </span>
+                      </div>
+                      <div className="folder-card-arrow" title="Open folder">
+                        <i className="fas fa-arrow-right" />
+                      </div>
+                    </div>
                   </>
                 )}
               </div>

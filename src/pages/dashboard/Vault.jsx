@@ -62,6 +62,25 @@ const Vault = () => {
     } catch (err) { showApiError(err); }
   };
 
+  const handleHide = async (id, name) => {
+    const ok = await confirm({
+      title: 'Hide Credential',
+      message: `Hide "${name}"? It will be removed from your standard vault and will require your Master Password to view in Hidden Items.`,
+      confirmLabel: 'Hide Credential',
+      variant: 'primary',
+      icon: 'fa-eye-slash',
+    });
+    if (!ok) return;
+
+    try {
+      await vaultAPI.toggleHide(id);
+      toast.success(`"${name}" is now hidden`);
+      load();
+    } catch (err) {
+      showApiError(err);
+    }
+  };
+
   const handleMove = async (folderId) => {
     if (!moveItem) return;
     await vaultAPI.moveToFolder(moveItem.id, folderId);
@@ -152,7 +171,7 @@ const Vault = () => {
                 <th>Email</th>
                 <th>Password</th>
                 <th>Updated</th>
-                <th style={{ width: 110 }} className="text-end">Actions</th>
+                <th style={{ width: 140 }} className="text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -175,8 +194,16 @@ const Vault = () => {
                   <td>{renderFieldCell(c.email, 'No Email', 'Email')}</td>
                   <td>{renderPasswordCell(c)}</td>
                   <td className="text-muted small">{new Date(c.updatedAt).toLocaleDateString()}</td>
-                  <td style={{ width: 110 }}>
+                  <td style={{ width: 140 }}>
                     <div className="d-flex gap-1 justify-content-end">
+                      <button
+                        type="button"
+                        className="dash-action-btn"
+                        title="Hide credential (protect with Master Password)"
+                        onClick={() => handleHide(c.id, c.serviceName)}
+                      >
+                        <i className="fas fa-eye-slash" />
+                      </button>
                       <button type="button" className="dash-action-btn" title="Move to folder" onClick={() => setMoveItem({ id: c.id, name: c.serviceName, folderId: c.folderId })}>
                         <i className="fas fa-folder-open" />
                       </button>

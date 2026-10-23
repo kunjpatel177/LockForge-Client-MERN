@@ -47,15 +47,17 @@ export const vaultAPI = {
   permanentDelete: (id) => api.delete(`/vault/${id}/permanent`),
   emptyTrash: () => api.delete('/vault/trash/empty'),
   toggleFavorite: (id) => api.patch(`/vault/${id}/favorite`),
+  toggleHide: (id) => api.patch(`/vault/${id}/hide`),
 };
 
 export const folderAPI = {
-  getAll: () => api.get('/folders'),
+  getAll: (params) => api.get('/folders', { params }),
   getOne: (id) => api.get(`/folders/${id}`),
   create: (name) => api.post('/folders', { name }),
   update: (id, name) => api.put(`/folders/${id}`, { name }),
   assignItems: (id, data) => api.post(`/folders/${id}/assign`, data),
   delete: (id) => api.delete(`/folders/${id}`),
+  toggleHide: (id) => api.patch(`/folders/${id}/hide`),
 };
 
 export const noteAPI = {
@@ -65,6 +67,14 @@ export const noteAPI = {
   update: (id, data) => api.put(`/notes/${id}`, data),
   moveToFolder: (id, folderId) => api.patch(`/notes/${id}/folder`, { folderId }),
   delete: (id) => api.delete(`/notes/${id}`),
+  toggleHide: (id) => api.patch(`/notes/${id}/hide`),
+};
+
+export const hiddenAPI = {
+  unlock: (masterPassword) => api.post('/hidden/unlock', { masterPassword }),
+  lock: () => api.post('/hidden/lock'),
+  status: () => api.get('/hidden/status'),
+  getItems: () => api.get('/hidden'),
 };
 
 export const sessionAPI = {

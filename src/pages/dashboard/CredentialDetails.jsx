@@ -41,6 +41,28 @@ const CredentialDetails = () => {
     } catch (err) { showApiError(err); }
   };
 
+  const handleToggleHide = async () => {
+    const action = cred.isHidden ? 'Unhide' : 'Hide';
+    const ok = await confirm({
+      title: `${action} Credential`,
+      message: cred.isHidden
+        ? `Unhide "${cred.serviceName}"? It will reappear in your standard vault and folder.`
+        : `Hide "${cred.serviceName}"? It will be removed from your standard vault and will require your Master Password to view in Hidden Items.`,
+      confirmLabel: action,
+      variant: cred.isHidden ? 'primary' : 'secondary',
+      icon: cred.isHidden ? 'fa-eye' : 'fa-eye-slash',
+    });
+    if (!ok) return;
+
+    try {
+      const res = await vaultAPI.toggleHide(id);
+      setCred(res.data.data);
+      toast.success(`"${cred.serviceName}" is now ${res.data.data.isHidden ? 'hidden' : 'visible'}`);
+    } catch (err) {
+      showApiError(err);
+    }
+  };
+
   if (!vaultUnlocked) return <VaultLockedState />;
   if (loading) return <LoadingSpinner />;
   if (!cred) return <p>Credential not found</p>;
@@ -64,10 +86,25 @@ const CredentialDetails = () => {
           <div className="dash-page-icon"><i className="fas fa-key" /></div>
           <div>
             <h1 className="dash-page-title mb-1">{cred.serviceName}</h1>
-            {cred.isFavorite && <span className="dash-badge warning mt-1"><i className="fas fa-star" />Favorite</span>}
+            <div className="d-flex align-items-center gap-2 mt-1">
+              {cred.isFavorite && <span className="dash-badge warning"><i className="fas fa-star" />Favorite</span>}
+              {cred.isHidden && (
+                <span className="dash-badge secondary">
+                  <i className="fas fa-eye-slash me-1" />Hidden
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <div className="d-flex gap-2">
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-modern btn-sm"
+            onClick={handleToggleHide}
+          >
+            <i className={`fas ${cred.isHidden ? 'fa-eye' : 'fa-eye-slash'} me-1`} />
+            {cred.isHidden ? 'Unhide' : 'Hide'}
+          </button>
           <Link to={`/vault/${id}/edit`} className="btn btn-primary btn-modern btn-sm">
             <i className="fas fa-pen me-1" />Edit
           </Link>

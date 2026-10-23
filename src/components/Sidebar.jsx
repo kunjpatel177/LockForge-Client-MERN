@@ -10,6 +10,7 @@ const navSections = [
       { to: '/folders', icon: 'fa-folder', label: 'Folders' },
       { to: '/favorites', icon: 'fa-star', label: 'Favorites' },
       { to: '/notes', icon: 'fa-sticky-note', label: 'Secure Notes' },
+      { to: '/hidden', icon: 'fa-eye-slash', label: 'Hidden Items' },
     ],
   },
   {

@@ -34,6 +34,7 @@ import Sessions from './pages/dashboard/Sessions';
 import ActivityLogs from './pages/dashboard/ActivityLogs';
 import BackupRestore from './pages/dashboard/BackupRestore';
 import Trash from './pages/dashboard/Trash';
+import HiddenItems from './pages/dashboard/HiddenItems';
 import Settings from './pages/dashboard/Settings';
 import Profile from './pages/dashboard/Profile';
 import ChangeMasterPassword from './pages/dashboard/ChangeMasterPassword';
@@ -74,6 +75,7 @@ function App() {
               <Route path="/activity" element={<ActivityLogs />} />
               <Route path="/backup" element={<BackupRestore />} />
               <Route path="/trash" element={<Trash />} />
+              <Route path="/hidden" element={<HiddenItems />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/change-master-password" element={<ChangeMasterPassword />} />

@@ -84,6 +84,60 @@ const FolderDetail = () => {
     } catch (err) { showApiError(err); }
   };
 
+  const handleHideCred = async (credId, name) => {
+    const ok = await confirm({
+      title: 'Hide Credential',
+      message: `Hide "${name}"? It will be removed from this view and will require your Master Password to access in Hidden Items.`,
+      confirmLabel: 'Hide Credential',
+      variant: 'primary',
+      icon: 'fa-eye-slash',
+    });
+    if (!ok) return;
+    try {
+      await vaultAPI.toggleHide(credId);
+      toast.success(`"${name}" is now hidden`);
+      load();
+    } catch (err) { showApiError(err); }
+  };
+
+  const handleHideNote = async (noteId, title) => {
+    const ok = await confirm({
+      title: 'Hide Note',
+      message: `Hide note "${title}"? It will be removed from this view and will require your Master Password to access in Hidden Items.`,
+      confirmLabel: 'Hide Note',
+      variant: 'primary',
+      icon: 'fa-eye-slash',
+    });
+    if (!ok) return;
+    try {
+      await noteAPI.toggleHide(noteId);
+      toast.success(`Note "${title}" is now hidden`);
+      load();
+    } catch (err) { showApiError(err); }
+  };
+
+  const handleToggleHideFolder = async () => {
+    const isHidden = !!folder?.isHidden;
+    const action = isHidden ? 'Unhide' : 'Hide';
+    const ok = await confirm({
+      title: `${action} Folder`,
+      message: isHidden
+        ? `Unhide folder "${folder.name}"? It and its contents will reappear in your standard folders view.`
+        : `Hide folder "${folder.name}"? It and its contents will be hidden from standard views and will require your Master Password to access in Hidden Items.`,
+      confirmLabel: `${action} Folder`,
+      variant: isHidden ? 'primary' : 'secondary',
+      icon: isHidden ? 'fa-eye' : 'fa-eye-slash',
+    });
+    if (!ok) return;
+    try {
+      const res = await folderAPI.toggleHide(id);
+      const updatedHidden = !!res.data?.data?.isHidden;
+      toast.success(`Folder "${folder.name}" is now ${updatedHidden ? 'hidden' : 'unhidden'}`);
+      setFolder((prev) => ({ ...prev, isHidden: updatedHidden }));
+      load();
+    } catch (err) { showApiError(err); }
+  };
+
   const handleNoteDelete = async (noteId) => {
     const note = notes.find((n) => n.id === noteId);
     const ok = await confirm({
@@ -176,15 +230,27 @@ const FolderDetail = () => {
       />
 
       <div className="dash-breadcrumb mb-3">
-        <Link to="/folders"><i className="fas fa-arrow-left me-1" />Back to Folders</Link>
+        <Link to={folder?.isHidden ? '/hidden' : '/folders'}>
+          <i className="fas fa-arrow-left me-1" />
+          {folder?.isHidden ? 'Back to Hidden Items' : 'Back to Folders'}
+        </Link>
       </div>
 
       <div className="folder-header-card mb-4">
         <div className="d-flex justify-content-between align-items-start flex-wrap gap-3">
           <div className="d-flex align-items-center gap-3">
-            <div className="folder-header-icon"><i className="fas fa-folder" /></div>
+            <div className={`folder-header-icon ${folder?.isHidden ? 'hidden-icon' : ''}`}>
+              <i className="fas fa-folder" />
+            </div>
             <div>
-              <h1 className="dash-page-title mb-1">{folder.name}</h1>
+              <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
+                <h1 className="dash-page-title mb-0">{folder.name}</h1>
+                {folder.isHidden && (
+                  <span className="dash-badge secondary" style={{ fontSize: '0.75rem' }}>
+                    <i className="fas fa-eye-slash me-1" />Hidden
+                  </span>
+                )}
+              </div>
               <div className="d-flex gap-3 text-muted small flex-wrap">
                 <span><i className="fas fa-key me-1" />{credentials.length} credentials</span>
                 <span><i className="fas fa-sticky-note me-1" />{notes.length} notes</span>
@@ -193,6 +259,14 @@ const FolderDetail = () => {
             </div>
           </div>
           <div className="d-flex flex-wrap gap-2">
+            <button
+              type="button"
+              className={`btn ${folder?.isHidden ? 'btn-outline-primary' : 'btn-outline-secondary'} btn-modern btn-sm`}
+              onClick={handleToggleHideFolder}
+            >
+              <i className={`fas ${folder?.isHidden ? 'fa-eye' : 'fa-eye-slash'} me-1`} />
+              {folder?.isHidden ? 'Unhide Folder' : 'Hide Folder'}
+            </button>
             <button type="button" className="btn btn-outline-primary btn-modern btn-sm" onClick={() => setShowAssignModal(true)}>
               <i className="fas fa-list-check me-1" />Add from List
             </button>
@@ -260,6 +334,14 @@ const FolderDetail = () => {
                     <td className="text-muted small">{new Date(c.updatedAt).toLocaleDateString()}</td>
                     <td>
                       <div className="d-flex gap-1">
+                        <button
+                          type="button"
+                          className="dash-action-btn"
+                          title="Hide credential (protect with Master Password)"
+                          onClick={() => handleHideCred(c.id, c.serviceName)}
+                        >
+                          <i className="fas fa-eye-slash" />
+                        </button>
                         <Link to={`/vault/${c.id}/edit`} className="dash-action-btn" title="Edit"><i className="fas fa-pen" /></Link>
                         <button type="button" className="dash-action-btn" title="Move to folder" onClick={() => setMoveItem({ type: 'credential', id: c.id, name: c.serviceName })}>
                           <i className="fas fa-folder-open" />
@@ -356,6 +438,14 @@ const FolderDetail = () => {
                   <div className="note-card-header">
                     <h5 className="note-card-title">{n.title}</h5>
                     <div className="d-flex gap-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        className="dash-action-btn"
+                        title="Hide note (protect with Master Password)"
+                        onClick={() => handleHideNote(n.id, n.title)}
+                      >
+                        <i className="fas fa-eye-slash" />
+                      </button>
                       <button type="button" className="dash-action-btn" title="Edit note" onClick={() => startEditNote(n)}>
                         <i className="fas fa-pen" />
                       </button>
