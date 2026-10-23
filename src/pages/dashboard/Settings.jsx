@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { userAPI } from '../../api';
@@ -9,15 +9,42 @@ import DashboardPageHeader from '../../components/DashboardPageHeader';
 import ConfirmModal from '../../components/ConfirmModal';
 import PasswordInput from '../../components/PasswordInput';
 import TwoFactorSettings from '../../components/TwoFactorSettings';
+import { useConfirm } from '../../hooks/useConfirm';
 
 const Settings = () => {
-  const { user, refreshProfile, destroyAuth } = useAuth();
+  const { user, refreshProfile, destroyAuth, logout } = useAuth();
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const { confirm, ConfirmDialog } = useConfirm();
+
   const [autoLock, setAutoLock] = useState(user?.settings?.autoLockMinutes || 15);
   const [saving, setSaving] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deleting, setDeleting] = useState(false);
+
+  const handleLogout = async () => {
+    const ok = await confirm({
+      title: 'Log Out',
+      message: 'Are you sure you want to log out of your LockForge account? Your session will end and your vault will be locked.',
+      confirmLabel: 'Log out',
+      variant: 'danger',
+      icon: 'fa-right-from-bracket',
+    });
+    if (!ok) return;
+
+    setLoggingOut(true);
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      navigate('/login');
+    } catch (err) {
+      toast.error(handleApiError(err).message);
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -54,15 +81,28 @@ const Settings = () => {
 
   return (
     <div>
+      {ConfirmDialog}
       <DashboardPageHeader
         icon="fa-cog"
         title="Settings"
         subtitle="Customize your LockForge experience and security preferences"
+        actions={
+          <button
+            type="button"
+            className="btn btn-outline-danger btn-modern"
+            onClick={handleLogout}
+            disabled={loggingOut}
+            title="Log out of your account"
+          >
+            <i className="fas fa-right-from-bracket me-2" />
+            {loggingOut ? 'Logging out...' : 'Log Out'}
+          </button>
+        }
       />
 
       <div className="row g-4">
-        <div className="col-md-6">
-          <div className="settings-card">
+        <div className="col-md-6 d-flex flex-column gap-4">
+          <div className="settings-card" style={{ height: 'auto' }}>
             <div className="settings-card-header">
               <div className="settings-card-icon"><i className="fas fa-palette" /></div>
               <div>
@@ -81,6 +121,35 @@ const Settings = () => {
               <button type="button" className="btn btn-primary btn-modern" onClick={handleSave} disabled={saving}>
                 {saving ? 'Saving...' : 'Save Settings'}
               </button>
+            </div>
+          </div>
+
+          <div className="settings-card" style={{ height: 'auto' }}>
+            <div className="settings-card-header">
+              <div className="settings-card-icon"><i className="fas fa-right-from-bracket" /></div>
+              <div>
+                <h5 className="fw-bold mb-0">Session & Logout</h5>
+                <small className="text-muted">Manage your active authentication session</small>
+              </div>
+            </div>
+            <div className="settings-card-body">
+              <p className="text-muted small mb-3">
+                Logged in as <strong className="text-body">{user?.email || 'User'}</strong>. Logging out ends your current session on this device and securely locks your vault.
+              </p>
+              <div className="d-flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="btn btn-outline-danger btn-modern"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                >
+                  <i className="fas fa-right-from-bracket me-2" />
+                  {loggingOut ? 'Logging out...' : 'Log Out'}
+                </button>
+                <Link to="/sessions" className="btn btn-ghost btn-modern">
+                  <i className="fas fa-desktop me-2" />Manage Sessions
+                </Link>
+              </div>
             </div>
           </div>
         </div>
