@@ -35,7 +35,10 @@ const DashboardLayout = () => {
 
   return (
     <div className="dashboard-layout">
-      <DashboardNavbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <DashboardNavbar
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        onUnlock={() => setShowUnlock(true)}
+      />
       <div className="dashboard-body">
         <Sidebar show={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         {sidebarOpen && (

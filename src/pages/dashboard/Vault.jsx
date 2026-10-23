@@ -141,29 +141,31 @@ const Vault = () => {
           action={<Link to="/vault/add" className="btn btn-primary btn-modern">Add Credential</Link>}
         />
       ) : (
-        <div className="modern-table-wrap">
-          <table className="table table-hover mb-0">
+        <div className="modern-table-wrap vault-table-wrap table-responsive">
+          <table className="table table-hover mb-0 vault-table">
             <thead>
               <tr>
-                <th style={{ width: 40 }} />
-                <th>Service</th>
+                <th style={{ width: 44 }} />
+                <th className="vault-col-service">Service</th>
                 <th>Folder</th>
                 <th>Username</th>
                 <th>Email</th>
                 <th>Password</th>
                 <th>Updated</th>
-                <th style={{ width: 100 }}>Actions</th>
+                <th style={{ width: 110 }} className="text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
               {credentials.map((c) => (
                 <tr key={c.id}>
-                  <td>
+                  <td style={{ width: 44 }}>
                     <button type="button" className="btn btn-link btn-sm p-0" onClick={() => handleFavorite(c.id)}>
                       <i className={`fas fa-star ${c.isFavorite ? 'text-warning' : 'text-muted'}`} />
                     </button>
                   </td>
-                  <td><Link to={`/vault/${c.id}`} className="fw-semibold text-decoration-none">{c.serviceName}</Link></td>
+                  <td className="vault-col-service">
+                    <Link to={`/vault/${c.id}`} className="fw-semibold text-decoration-none vault-service-link">{c.serviceName}</Link>
+                  </td>
                   <td>
                     {c.folderId ? (
                       <Link to={`/folders/${c.folderId}`} className="dash-badge primary text-decoration-none">{folderName(c.folderId)}</Link>
@@ -173,8 +175,8 @@ const Vault = () => {
                   <td>{renderFieldCell(c.email, 'No Email', 'Email')}</td>
                   <td>{renderPasswordCell(c)}</td>
                   <td className="text-muted small">{new Date(c.updatedAt).toLocaleDateString()}</td>
-                  <td>
-                    <div className="d-flex gap-1">
+                  <td style={{ width: 110 }}>
+                    <div className="d-flex gap-1 justify-content-end">
                       <button type="button" className="dash-action-btn" title="Move to folder" onClick={() => setMoveItem({ id: c.id, name: c.serviceName, folderId: c.folderId })}>
                         <i className="fas fa-folder-open" />
                       </button>
