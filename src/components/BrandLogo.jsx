@@ -11,13 +11,12 @@ const BrandLogo = ({ size = 'sm', className = '', alt = 'LockForge logo' }) => {
 
   return (
     <img
-      src={"/LockForge_light.svg" || "/android-chrome-512x512.png" || "/LockForge_light.png"}
-      // src="/android-chrome-512x512.png"
+      src="/favicon.svg"
       alt={alt}
       width={px}
       height={px}
       className={`brand-logo-img brand-logo-img--${size} ${className}`.trim()}
-      loading="lazy"
+      loading="eager"
       decoding="async"
     />
   );

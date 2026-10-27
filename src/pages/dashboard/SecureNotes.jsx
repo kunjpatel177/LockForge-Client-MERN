@@ -20,17 +20,25 @@ const SecureNotes = () => {
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: '', content: '', folderId: '', isFavorite: false });
   const [moveItem, setMoveItem] = useState(null);
   const [viewNote, setViewNote] = useState(null);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 280);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const load = async () => {
     if (!vaultUnlocked) { setLoading(false); return; }
     try {
       const [noteRes, folderRes] = await Promise.all([
-        noteAPI.getAll({ search }),
+        noteAPI.getAll({ search: debouncedSearch }),
         folderAPI.getAll(),
       ]);
       setNotes(noteRes.data.data);
@@ -39,7 +47,7 @@ const SecureNotes = () => {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, [vaultUnlocked, search]);
+  useEffect(() => { load(); }, [vaultUnlocked, debouncedSearch]);
 
   const startEdit = (note) => {
     setEditing(note.id);

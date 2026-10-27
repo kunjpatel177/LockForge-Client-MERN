@@ -18,15 +18,23 @@ const Vault = () => {
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [folderFilter, setFolderFilter] = useState('');
   const [sort, setSort] = useState('updatedAt');
   const [moveItem, setMoveItem] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 280);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const load = async () => {
     if (!vaultUnlocked) { setLoading(false); return; }
     try {
       const [credRes, folderRes] = await Promise.all([
-        vaultAPI.getAll({ search, folderId: folderFilter, sort, order: 'desc' }),
+        vaultAPI.getAll({ search: debouncedSearch, folderId: folderFilter, sort, order: 'desc' }),
         folderAPI.getAll(),
       ]);
       setCredentials(credRes.data.data);
@@ -38,7 +46,7 @@ const Vault = () => {
     }
   };
 
-  useEffect(() => { load(); }, [vaultUnlocked, search, folderFilter, sort]);
+  useEffect(() => { load(); }, [vaultUnlocked, debouncedSearch, folderFilter, sort]);
 
   const handleDelete = async (id) => {
     const ok = await confirm({
