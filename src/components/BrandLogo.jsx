@@ -11,7 +11,7 @@ const BrandLogo = ({ size = 'sm', className = '', alt = 'LockForge logo' }) => {
 
   return (
     <img
-      src="/favicon.svg"
+      src="/LockForge_light.svg"
       alt={alt}
       width={px}
       height={px}
