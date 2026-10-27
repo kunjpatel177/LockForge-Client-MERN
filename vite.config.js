@@ -17,14 +17,6 @@ export default defineConfig({
     target: 'esnext',
     minify: 'esbuild',
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['bootstrap', 'react-toastify'],
-        },
-      },
-    },
+    chunkSizeWarningLimit: 1200,
   },
 });
