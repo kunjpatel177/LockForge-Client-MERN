@@ -123,7 +123,7 @@ a:hover {
   width: 100%;
   background: var(--navbar-bg) !important;
   backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  /* -webkit-backdrop-filter: blur(20px) saturate(180%) !important; */
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
@@ -142,7 +142,7 @@ a:hover {
   z-index: 1040;
   background: var(--navbar-bg) !important;
   backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  /* -webkit-backdrop-filter: blur(16px) saturate(180%) !important; */
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 1px 0 var(--border-color), 0 4px 20px -2px rgba(15, 23, 42, 0.04);
   transition: background-color 0.3s ease, border-color 0.3s ease;
@@ -641,7 +641,7 @@ a:hover {
   background: var(--bg-card);
   box-shadow: 0 20px 40px -8px rgba(15, 23, 42, 0.18), 0 0 0 1px var(--border-color);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* -webkit-backdrop-filter: blur(20px); */
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px) scale(0.96);
@@ -956,7 +956,9 @@ a:hover {
     gap: 0.35rem;
   }
   .navbar-pro-user-btn {
-    padding: 0 0.4rem 0 0.25rem;
+    height: 2.5rem !important;
+    width: 100% !important;
+    padding: 0.5rem 0.5rem 0.5rem 0.4rem;
   }
   .navbar-avatar {
     width: 26px;
@@ -3666,6 +3668,83 @@ a:hover {
   z-index: 1055;
 }
 
+/* Backup import modal consistency & scrolling */
+.backup-import-modal-dialog {
+  max-width: 520px;
+  width: 100%;
+}
+
+.backup-import-modal-content {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius, 16px) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-lg) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: 85vh;
+  max-height: 85dvh;
+  overflow: hidden;
+}
+
+.backup-import-modal-body {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.backup-import-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.backup-import-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.backup-import-modal-body::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.backup-import-option {
+  padding: 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: var(--bg-alt);
+  border: 1px solid var(--border-color) !important;
+}
+
+.backup-import-option:hover {
+  border-color: var(--primary) !important;
+}
+
+.backup-import-option.active-smart {
+  background: rgba(99, 102, 241, 0.08) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.backup-import-option.active-replace {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444;
+}
+
+.backup-import-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
 .assign-items-list {
   max-height: 320px;
   overflow-y: auto;
@@ -4853,10 +4932,65 @@ body {
     left: 0;
     right: 0;
   }
+
+  /* Backup import modal responsive (reduced height & scrollable) */
+  .backup-import-modal-dialog {
+    margin: 1rem auto !important;
+    width: calc(100% - 1.25rem) !important;
+    max-width: calc(100% - 1.25rem) !important;
+  }
+
+  .backup-import-modal-content {
+    max-height: 78vh !important;
+    max-height: 78dvh !important;
+    border-radius: 14px !important;
+  }
+
+  .backup-import-modal-body {
+    padding: 0.85rem 0.95rem !important;
+    max-height: calc(78vh - 120px) !important;
+    max-height: calc(78dvh - 120px) !important;
+  }
+
+  .backup-import-option {
+    padding: 0.85rem !important;
+  }
+
+  .backup-import-option label {
+    font-size: 0.92rem !important;
+  }
+
+  .backup-import-option p {
+    font-size: 0.79rem !important;
+    line-height: 1.45;
+  }
+
+  .backup-import-footer-btns {
+    display: flex;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .backup-import-footer-btns .btn {
+    flex: 1 1 50%;
+    min-height: 42px;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 /* ─── Small phones (≤480px) ─── */
 @media (max-width: 480px) {
+  .backup-import-modal-content {
+    max-height: 76vh !important;
+    max-height: 76dvh !important;
+  }
+
+  .backup-import-modal-body {
+    padding: 0.75rem 0.85rem !important;
+    max-height: calc(76vh - 115px) !important;
+    max-height: calc(76dvh - 115px) !important;
+  }
   .brand-logo {
     font-size: 1.1rem;
   }

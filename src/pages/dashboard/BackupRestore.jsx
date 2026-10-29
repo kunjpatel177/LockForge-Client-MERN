@@ -113,17 +113,25 @@ const BackupRestore = () => {
       {ConfirmDialog}
 
       {showImportModal && (
-        <div className="modal show d-block confirm-modal-backdrop" tabIndex="-1">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content border-0 shadow">
-              <div className="modal-header border-0 pb-0">
+        <div
+          className="modal show d-block confirm-modal-backdrop"
+          tabIndex="-1"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !loading) setShowImportModal(false);
+          }}
+        >
+          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable backup-import-modal-dialog">
+            <div className="modal-content border-0 shadow backup-import-modal-content">
+              <div className="modal-header border-0 pb-0 flex-shrink-0">
                 <div className="d-flex align-items-center gap-2">
-                  <div className="confirm-modal-icon warning" style={{ width: 36, height: 36, fontSize: 16 }}>
+                  <div className="backup-import-icon-badge">
                     <i className="fas fa-file-import" />
                   </div>
                   <div>
-                    <h5 className="modal-title fw-bold mb-0">Select Import Option</h5>
-                    <small className="text-muted">Choose how you want to restore your vault data</small>
+                    <h5 className="modal-title fw-bold mb-0" style={{ fontSize: '1.05rem' }}>Select Import Option</h5>
+                    <small className="text-muted" style={{ fontSize: '0.8rem' }}>Choose how you want to restore your vault data</small>
                   </div>
                 </div>
                 <button
@@ -135,20 +143,21 @@ const BackupRestore = () => {
                 />
               </div>
 
-              <div className="modal-body py-4">
+              <div className="modal-body py-3 py-sm-4 backup-import-modal-body">
                 <div className="d-flex flex-column gap-3">
                   {/* Option 1: Smart Merge */}
                   <div
-                    className={`p-3 rounded border ${importMode === 'smart_merge' ? 'border-primary bg-primary-subtle' : 'border-secondary-subtle bg-body'}`}
-                    style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    className={`rounded-3 backup-import-option ${
+                      importMode === 'smart_merge' ? 'active-smart' : ''
+                    }`}
                     onClick={() => setImportMode('smart_merge')}
                   >
-                    <div className="d-flex align-items-start gap-3">
+                    <div className="d-flex align-items-start gap-2 gap-sm-3">
                       <input
                         type="radio"
                         name="importMode"
                         id="modeSmartMerge"
-                        className="form-check-input mt-1"
+                        className="form-check-input mt-1 flex-shrink-0"
                         checked={importMode === 'smart_merge'}
                         onChange={() => setImportMode('smart_merge')}
                       />
@@ -166,16 +175,17 @@ const BackupRestore = () => {
 
                   {/* Option 2: Replace All Data */}
                   <div
-                    className={`p-3 rounded border ${importMode === 'replace_all' ? 'border-danger bg-danger-subtle' : 'border-secondary-subtle bg-body'}`}
-                    style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    className={`rounded-3 backup-import-option ${
+                      importMode === 'replace_all' ? 'active-replace' : ''
+                    }`}
                     onClick={() => setImportMode('replace_all')}
                   >
-                    <div className="d-flex align-items-start gap-3">
+                    <div className="d-flex align-items-start gap-2 gap-sm-3">
                       <input
                         type="radio"
                         name="importMode"
                         id="modeReplaceAll"
-                        className="form-check-input mt-1"
+                        className="form-check-input mt-1 flex-shrink-0"
                         checked={importMode === 'replace_all'}
                         onChange={() => setImportMode('replace_all')}
                       />
@@ -193,36 +203,38 @@ const BackupRestore = () => {
                 </div>
               </div>
 
-              <div className="modal-footer border-0 pt-0">
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-modern"
-                  onClick={() => setShowImportModal(false)}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className={`btn ${importMode === 'replace_all' ? 'btn-danger' : 'btn-primary'} btn-modern`}
-                  onClick={executeImport}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" />
-                      Restoring...
-                    </>
-                  ) : importMode === 'replace_all' ? (
-                    <>
-                      <i className="fas fa-triangle-exclamation me-1" />Replace All &amp; Restore
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-arrows-rotate me-1" />Smart Merge &amp; Restore
-                    </>
-                  )}
-                </button>
+              <div className="modal-footer border-0 pt-2 flex-shrink-0">
+                <div className="backup-import-footer-btns d-flex w-100 justify-content-end gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-modern"
+                    onClick={() => setShowImportModal(false)}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn ${importMode === 'replace_all' ? 'btn-danger' : 'btn-primary'} btn-modern`}
+                    onClick={executeImport}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" />
+                        Restoring...
+                      </>
+                    ) : importMode === 'replace_all' ? (
+                      <>
+                        <i className="fas fa-triangle-exclamation me-1" />Replace All &amp; Restore
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-arrows-rotate me-1" />Smart Merge &amp; Restore
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
