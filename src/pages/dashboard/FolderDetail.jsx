@@ -28,6 +28,7 @@ const FolderDetail = () => {
   const [viewNote, setViewNote] = useState(null);
   const [editingNote, setEditingNote] = useState(null);
   const [noteForm, setNoteForm] = useState({ title: '', content: '', folderId: '', isFavorite: false });
+  const [folderSearch, setFolderSearch] = useState('');
 
   const load = async () => {
     if (!vaultUnlocked) { setLoading(false); return; }
@@ -218,6 +219,27 @@ const FolderDetail = () => {
 
   const totalItems = credentials.length + notes.length;
 
+  const q = folderSearch.trim().toLowerCase();
+  const filteredCreds = credentials.filter((c) => {
+    if (!q) return true;
+    return (
+      (c.serviceName || '').toLowerCase().includes(q) ||
+      (c.username || '').toLowerCase().includes(q) ||
+      (c.email || '').toLowerCase().includes(q) ||
+      (c.url || '').toLowerCase().includes(q) ||
+      (Array.isArray(c.tags) && c.tags.some((t) => t.toLowerCase().includes(q))) ||
+      (c.notes || '').toLowerCase().includes(q)
+    );
+  });
+
+  const filteredNotes = notes.filter((n) => {
+    if (!q) return true;
+    return (
+      (n.title || '').toLowerCase().includes(q) ||
+      (n.content || '').toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div>
       {ConfirmDialog}
@@ -303,18 +325,42 @@ const FolderDetail = () => {
         </div>
       </div>
 
-      <ul className="nav nav-tabs folder-tabs mb-4">
-        <li className="nav-item">
-          <button type="button" className={`nav-link ${activeTab === 'credentials' ? 'active' : ''}`} onClick={() => setActiveTab('credentials')}>
-            <i className="fas fa-key me-1" />Credentials ({credentials.length})
-          </button>
-        </li>
-        <li className="nav-item">
-          <button type="button" className={`nav-link ${activeTab === 'notes' ? 'active' : ''}`} onClick={() => setActiveTab('notes')}>
-            <i className="fas fa-sticky-note me-1" />Notes ({notes.length})
-          </button>
-        </li>
-      </ul>
+      <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <ul className="nav nav-tabs folder-tabs mb-0 border-bottom-0">
+          <li className="nav-item">
+            <button type="button" className={`nav-link ${activeTab === 'credentials' ? 'active' : ''}`} onClick={() => setActiveTab('credentials')}>
+              <i className="fas fa-key me-1" />Credentials ({filteredCreds.length}{folderSearch ? ` of ${credentials.length}` : ''})
+            </button>
+          </li>
+          <li className="nav-item">
+            <button type="button" className={`nav-link ${activeTab === 'notes' ? 'active' : ''}`} onClick={() => setActiveTab('notes')}>
+              <i className="fas fa-sticky-note me-1" />Notes ({filteredNotes.length}{folderSearch ? ` of ${notes.length}` : ''})
+            </button>
+          </li>
+        </ul>
+
+        {(credentials.length > 0 || notes.length > 0) && (
+          <div className="dash-search-wrap" style={{ maxWidth: 280, minWidth: 200 }}>
+            <i className="fas fa-search" />
+            <input
+              className="form-control form-control-sm"
+              placeholder={`Search in this folder...`}
+              value={folderSearch}
+              onChange={(e) => setFolderSearch(e.target.value)}
+            />
+            {folderSearch && (
+              <button
+                type="button"
+                className="dash-search-clear"
+                onClick={() => setFolderSearch('')}
+                title="Clear search"
+              >
+                <i className="fas fa-times" />
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       {activeTab === 'credentials' && (
         credentials.length === 0 ? (
@@ -328,6 +374,17 @@ const FolderDetail = () => {
                 <Link to={`/vault/add?folderId=${id}`} className="btn btn-primary btn-modern btn-sm">New Credential</Link>
               </div>
             )}
+          />
+        ) : filteredCreds.length === 0 ? (
+          <EmptyState
+            icon="fa-magnifying-glass"
+            title="No credentials found"
+            description={`No credentials in this folder match "${folderSearch}".`}
+            action={
+              <button type="button" className="btn btn-outline-primary btn-modern btn-sm" onClick={() => setFolderSearch('')}>
+                Clear Search
+              </button>
+            }
           />
         ) : (
           <div className="modern-table-wrap">
@@ -343,7 +400,7 @@ const FolderDetail = () => {
                 </tr>
               </thead>
               <tbody>
-                {credentials.map((c) => (
+                {filteredCreds.map((c) => (
                   <tr key={c.id}>
                     <td><Link to={`/vault/${c.id}`} className="fw-semibold text-decoration-none">{c.serviceName}</Link></td>
                     <td>{renderFieldCell(c.username, 'No Username', 'Username')}</td>
@@ -436,59 +493,70 @@ const FolderDetail = () => {
           )}
 
           {notes.length === 0 ? (
-          <EmptyState
-            icon="fa-sticky-note"
-            title="No notes in this folder"
-            description="Add existing notes from your vault or create a new one."
-            action={(
-              <div className="d-flex gap-2 justify-content-center flex-wrap">
-                <button type="button" className="btn btn-outline-primary btn-modern btn-sm" onClick={() => setShowAssignModal(true)}>Add from List</button>
-                <Link to={`/notes?folderId=${id}&new=1`} className="btn btn-primary btn-modern btn-sm">New Note</Link>
-              </div>
-            )}
-          />
-        ) : (
-          <div className="row g-3">
-            {notes.map((n) => (
-              <div key={n.id} className="col-md-6">
-                <div
-                  className="note-card note-card-clickable"
-                  onClick={() => setViewNote(n)}
-                  onKeyDown={(e) => e.key === 'Enter' && setViewNote(n)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className="note-card-header">
-                    <h5 className="note-card-title">{n.title}</h5>
-                    <div className="d-flex gap-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        className="dash-action-btn"
-                        title="Hide note (protect with Master Password)"
-                        onClick={() => handleHideNote(n.id, n.title)}
-                      >
-                        <i className="fas fa-eye-slash" />
-                      </button>
-                      <button type="button" className="dash-action-btn" title="Edit note" onClick={() => startEditNote(n)}>
-                        <i className="fas fa-pen" />
-                      </button>
-                      <button type="button" className="dash-action-btn" title="Move to folder" onClick={() => setMoveItem({ type: 'note', id: n.id, name: n.title })}>
-                        <i className="fas fa-folder-open" />
-                      </button>
-                      <button type="button" className="dash-action-btn danger" title="Remove from folder" onClick={() => handleRemove('note', n.id, n.title)}>
-                        <i className="fas fa-folder-minus" />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-muted small mb-2 note-card-preview">
-                    {n.content || 'Empty note'}
-                  </p>
-                  <small className="text-muted">{new Date(n.updatedAt).toLocaleDateString()}</small>
+            <EmptyState
+              icon="fa-sticky-note"
+              title="No notes in this folder"
+              description="Add existing notes from your vault or create a new one."
+              action={(
+                <div className="d-flex gap-2 justify-content-center flex-wrap">
+                  <button type="button" className="btn btn-outline-primary btn-modern btn-sm" onClick={() => setShowAssignModal(true)}>Add from List</button>
+                  <Link to={`/notes?folderId=${id}&new=1`} className="btn btn-primary btn-modern btn-sm">New Note</Link>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              )}
+            />
+          ) : filteredNotes.length === 0 ? (
+            <EmptyState
+              icon="fa-magnifying-glass"
+              title="No notes found"
+              description={`No notes in this folder match "${folderSearch}".`}
+              action={
+                <button type="button" className="btn btn-outline-primary btn-modern btn-sm" onClick={() => setFolderSearch('')}>
+                  Clear Search
+                </button>
+              }
+            />
+          ) : (
+            <div className="row g-3">
+              {filteredNotes.map((n) => (
+                <div key={n.id} className="col-md-6">
+                  <div
+                    className="note-card note-card-clickable"
+                    onClick={() => setViewNote(n)}
+                    onKeyDown={(e) => e.key === 'Enter' && setViewNote(n)}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="note-card-header">
+                      <h5 className="note-card-title">{n.title}</h5>
+                      <div className="d-flex gap-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          className="dash-action-btn"
+                          title="Hide note (protect with Master Password)"
+                          onClick={() => handleHideNote(n.id, n.title)}
+                        >
+                          <i className="fas fa-eye-slash" />
+                        </button>
+                        <button type="button" className="dash-action-btn" title="Edit note" onClick={() => startEditNote(n)}>
+                          <i className="fas fa-pen" />
+                        </button>
+                        <button type="button" className="dash-action-btn" title="Move to folder" onClick={() => setMoveItem({ type: 'note', id: n.id, name: n.title })}>
+                          <i className="fas fa-folder-open" />
+                        </button>
+                        <button type="button" className="dash-action-btn danger" title="Remove from folder" onClick={() => handleRemove('note', n.id, n.title)}>
+                          <i className="fas fa-folder-minus" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-muted small mb-2 note-card-preview">
+                      {n.content || 'Empty note'}
+                    </p>
+                    <small className="text-muted">{new Date(n.updatedAt).toLocaleDateString()}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>

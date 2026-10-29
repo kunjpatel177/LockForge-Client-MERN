@@ -15,20 +15,60 @@ const Folders = () => {
   const navigate = useNavigate();
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [filterType, setFilterType] = useState('all');
+  const [sort, setSort] = useState('name');
+  const [totalCount, setTotalCount] = useState(0);
+  const [counts, setCounts] = useState({ all: 0, withItems: 0, empty: 0 });
   const [newName, setNewName] = useState('');
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState('');
   const [assignFolder, setAssignFolder] = useState(null);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 280);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const load = async () => {
     try {
-      const res = await folderAPI.getAll();
+      const params = {
+        search: debouncedSearch,
+        filterType,
+        sort: sort === 'nameDesc' ? 'name' : sort,
+        order: sort === 'nameDesc' ? 'desc' : (sort === 'createdAt' || sort === 'items' ? 'desc' : 'asc'),
+      };
+      const [res, baselineRes] = await Promise.all([
+        folderAPI.getAll(params),
+        folderAPI.getAll({}),
+      ]);
       setFolders(res.data.data);
+      const all = baselineRes.data.data || [];
+      setTotalCount(all.length);
+      setCounts({
+        all: all.length,
+        withItems: all.filter((f) => (f.credentialCount || 0) + (f.noteCount || 0) > 0).length,
+        empty: all.filter((f) => (f.credentialCount || 0) + (f.noteCount || 0) === 0).length,
+      });
     } catch (err) { toast.error(handleApiError(err).message); }
     finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, [debouncedSearch, filterType, sort]);
+
+  const clearFilters = () => {
+    setSearch('');
+    setDebouncedSearch('');
+    setFilterType('all');
+    setSort('name');
+  };
+
+  const isFiltered = Boolean(search || filterType !== 'all' || sort !== 'name');
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -143,18 +183,105 @@ const Folders = () => {
         }
       />
 
-      <form onSubmit={handleCreate} className="folder-create-bar mb-4">
+      <form onSubmit={handleCreate} className="folder-create-bar mb-3">
         <i className="fas fa-folder-plus text-primary" />
         <input className="form-control border-0 bg-transparent" placeholder="New folder name..." value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={LIMITS.MAX_FOLDER_NAME_LENGTH} />
         <button type="submit" className="btn btn-primary btn-modern btn-sm folder-btn">Create Folder</button>
       </form>
 
+      {/* Professional Search & Filter Bar */}
+      <div className="dash-filter-bar mb-4">
+        <div className="dash-search-wrap">
+          <i className="fas fa-search" />
+          <input
+            className="form-control"
+            placeholder="Search folders by name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button
+              type="button"
+              className="dash-search-clear"
+              onClick={() => setSearch('')}
+              title="Clear search"
+            >
+              <i className="fas fa-times" />
+            </button>
+          )}
+        </div>
+
+        {/* Sorting Dropdown */}
+        <select
+          className="form-select"
+          style={{ maxWidth: 180 }}
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+        >
+          <option value="name">🔤 Name (A-Z)</option>
+          <option value="nameDesc">🔤 Name (Z-A)</option>
+          <option value="items">📦 Most Items</option>
+          <option value="createdAt">🕒 Recently Created</option>
+        </select>
+
+        {/* Quick Filter Pills */}
+        <div className="search-filter-pills">
+          <button
+            type="button"
+            className={`search-filter-pill ${filterType === 'all' ? 'active' : ''}`}
+            onClick={() => setFilterType('all')}
+          >
+            All Folders <span className="opacity-75">({counts.all})</span>
+          </button>
+          <button
+            type="button"
+            className={`search-filter-pill ${filterType === 'with_items' ? 'active' : ''}`}
+            onClick={() => setFilterType('with_items')}
+          >
+            <i className="fas fa-folder" /> With Items <span className="opacity-75">({counts.withItems})</span>
+          </button>
+          <button
+            type="button"
+            className={`search-filter-pill ${filterType === 'empty' ? 'active' : ''}`}
+            onClick={() => setFilterType('empty')}
+          >
+            <i className="fas fa-folder-open" /> Empty <span className="opacity-75">({counts.empty})</span>
+          </button>
+        </div>
+
+        {/* Result Counter & Reset */}
+        {isFiltered && (
+          <div className="search-result-info">
+            <span>
+              Showing <strong>{folders.length}</strong> of <strong>{totalCount}</strong> folder{totalCount !== 1 ? 's' : ''}
+              {search && <span> matching &quot;{search}&quot;</span>}
+            </span>
+            <button type="button" className="btn btn-link" onClick={clearFilters}>
+              <i className="fas fa-rotate-left me-1" />Reset Filters
+            </button>
+          </div>
+        )}
+      </div>
+
       {folders.length === 0 ? (
-        <EmptyState
-          icon="fa-folder-open"
-          title="No folders yet"
-          description="Create your first folder to organize credentials and notes."
-        />
+        isFiltered ? (
+          <EmptyState
+            icon="fa-magnifying-glass"
+            title="No folders found"
+            description="No folders match your active search and filter criteria. Try adjusting your query or resetting filters."
+            action={
+              <button type="button" className="btn btn-outline-primary btn-modern" onClick={clearFilters}>
+                <i className="fas fa-rotate-left me-1" />Clear All Filters
+              </button>
+            }
+          />
+        ) : (
+          <EmptyState
+            icon="fa-folder-open"
+            title="No folders yet"
+            description="Create your first folder to organize credentials and notes."
+          />
+        )
       ) : (
         <div className="row g-3">
           {folders.map((f) => (

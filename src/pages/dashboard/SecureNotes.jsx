@@ -21,6 +21,12 @@ const SecureNotes = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchScope, setSearchScope] = useState('all');
+  const [folderFilter, setFolderFilter] = useState('');
+  const [quickFilter, setQuickFilter] = useState('all');
+  const [sort, setSort] = useState('updatedAt');
+  const [totalCount, setTotalCount] = useState(0);
+  const [counts, setCounts] = useState({ all: 0, favorites: 0, inFolder: 0, unassigned: 0 });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: '', content: '', folderId: '', isFavorite: false });
@@ -37,17 +43,54 @@ const SecureNotes = () => {
   const load = async () => {
     if (!vaultUnlocked) { setLoading(false); return; }
     try {
-      const [noteRes, folderRes] = await Promise.all([
-        noteAPI.getAll({ search: debouncedSearch }),
+      const params = {
+        search: debouncedSearch,
+        scope: searchScope,
+        sort: sort === 'titleDesc' ? 'title' : sort,
+        order: sort === 'title' ? 'asc' : 'desc',
+      };
+      if (folderFilter === 'unassigned') {
+        params.unassigned = 'true';
+      } else if (folderFilter) {
+        params.folderId = folderFilter;
+      }
+      if (quickFilter === 'favorites') params.favorite = 'true';
+      if (quickFilter === 'inFolder') params.hasFolder = 'true';
+      if (quickFilter === 'unassigned') params.unassigned = 'true';
+
+      const [noteRes, folderRes, baselineRes] = await Promise.all([
+        noteAPI.getAll(params),
         folderAPI.getAll(),
+        noteAPI.getAll({}),
       ]);
       setNotes(noteRes.data.data);
       setFolders(folderRes.data.data);
+      const allNotes = baselineRes.data.data || [];
+      setTotalCount(allNotes.length);
+      setCounts({
+        all: allNotes.length,
+        favorites: allNotes.filter((n) => n.isFavorite).length,
+        inFolder: allNotes.filter((n) => !!n.folderId).length,
+        unassigned: allNotes.filter((n) => !n.folderId).length,
+      });
     } catch (err) { showApiError(err); }
     finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, [vaultUnlocked, debouncedSearch]);
+  useEffect(() => {
+    load();
+  }, [vaultUnlocked, debouncedSearch, searchScope, folderFilter, quickFilter, sort]);
+
+  const clearFilters = () => {
+    setSearch('');
+    setDebouncedSearch('');
+    setSearchScope('all');
+    setFolderFilter('');
+    setQuickFilter('all');
+    setSort('updatedAt');
+  };
+
+  const isFiltered = Boolean(search || searchScope !== 'all' || folderFilter || quickFilter !== 'all' || sort !== 'updatedAt');
 
   const startEdit = (note) => {
     setEditing(note.id);
@@ -198,15 +241,119 @@ const SecureNotes = () => {
       />
 
       <div className="dash-filter-bar mb-4">
+        {/* Main Search Input */}
         <div className="dash-search-wrap">
           <i className="fas fa-search" />
           <input
             className="form-control"
-            placeholder="Search notes by title or content..."
+            placeholder={
+              searchScope === 'title'
+                ? 'Search note titles...'
+                : searchScope === 'content'
+                ? 'Search note content...'
+                : 'Search notes by title or content...'
+            }
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          {search && (
+            <button
+              type="button"
+              className="dash-search-clear"
+              onClick={() => setSearch('')}
+              title="Clear search"
+            >
+              <i className="fas fa-times" />
+            </button>
+          )}
         </div>
+
+        {/* Search Scope */}
+        <select
+          className="form-select"
+          style={{ maxWidth: 180 }}
+          value={searchScope}
+          onChange={(e) => setSearchScope(e.target.value)}
+        >
+          <option value="all">🔍 Title &amp; Content</option>
+          <option value="title">🏷️ Title Only</option>
+          <option value="content">📄 Content Only</option>
+        </select>
+
+        {/* Folder Filter */}
+        <select
+          className="form-select"
+          style={{ maxWidth: 165 }}
+          value={folderFilter}
+          onChange={(e) => setFolderFilter(e.target.value)}
+        >
+          <option value="">📁 All Folders</option>
+          <option value="unassigned">📂 Unassigned</option>
+          {folders.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.name}
+            </option>
+          ))}
+        </select>
+
+        {/* Sorting */}
+        <select
+          className="form-select"
+          style={{ maxWidth: 175 }}
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+        >
+          <option value="updatedAt">⚡ Recently Updated</option>
+          <option value="title">🔤 Title (A-Z)</option>
+          <option value="titleDesc">🔤 Title (Z-A)</option>
+          <option value="createdAt">🕒 Date Created</option>
+          <option value="favoriteFirst">⭐ Favorites First</option>
+        </select>
+
+        {/* Quick Filter Pills */}
+        <div className="search-filter-pills">
+          <button
+            type="button"
+            className={`search-filter-pill ${quickFilter === 'all' ? 'active' : ''}`}
+            onClick={() => setQuickFilter('all')}
+          >
+            All <span className="opacity-75">({counts.all})</span>
+          </button>
+          <button
+            type="button"
+            className={`search-filter-pill ${quickFilter === 'favorites' ? 'active' : ''}`}
+            onClick={() => setQuickFilter('favorites')}
+          >
+            <i className="fas fa-star text-warning" /> Favorites <span className="opacity-75">({counts.favorites})</span>
+          </button>
+          <button
+            type="button"
+            className={`search-filter-pill ${quickFilter === 'inFolder' ? 'active' : ''}`}
+            onClick={() => setQuickFilter('inFolder')}
+          >
+            <i className="fas fa-folder" /> In Folder <span className="opacity-75">({counts.inFolder})</span>
+          </button>
+          <button
+            type="button"
+            className={`search-filter-pill ${quickFilter === 'unassigned' ? 'active' : ''}`}
+            onClick={() => setQuickFilter('unassigned')}
+          >
+            <i className="fas fa-file" /> Unassigned <span className="opacity-75">({counts.unassigned})</span>
+          </button>
+        </div>
+
+        {/* Result Counter & Reset */}
+        {isFiltered && (
+          <div className="search-result-info">
+            <span>
+              Showing <strong>{notes.length}</strong> of <strong>{totalCount}</strong> secure note{totalCount !== 1 ? 's' : ''}
+              {search && <span> matching &quot;{search}&quot;</span>}
+            </span>
+            <button type="button" className="btn btn-link" onClick={clearFilters}>
+              <i className="fas fa-rotate-left me-1" />Reset Filters
+            </button>
+          </div>
+        )}
       </div>
 
       {showForm && (
@@ -250,16 +397,29 @@ const SecureNotes = () => {
       )}
 
       {notes.length === 0 ? (
-        <EmptyState
-          icon="fa-sticky-note"
-          title={search ? 'No matching notes' : 'No secure notes yet'}
-          description={search ? 'Try a different search term.' : 'Create encrypted notes for Wi-Fi passwords, recovery codes, and more.'}
-          action={!search && (
-            <button type="button" className="btn btn-primary btn-modern" onClick={() => setShowForm(true)}>
-              Create Note
-            </button>
-          )}
-        />
+        isFiltered ? (
+          <EmptyState
+            icon="fa-magnifying-glass"
+            title="No notes found"
+            description="No notes match your active search and filter criteria. Try adjusting your query or resetting filters."
+            action={
+              <button type="button" className="btn btn-outline-primary btn-modern" onClick={clearFilters}>
+                <i className="fas fa-rotate-left me-1" />Clear All Filters
+              </button>
+            }
+          />
+        ) : (
+          <EmptyState
+            icon="fa-sticky-note"
+            title="No secure notes yet"
+            description="Create encrypted notes for Wi-Fi passwords, recovery codes, and more."
+            action={
+              <button type="button" className="btn btn-primary btn-modern" onClick={() => setShowForm(true)}>
+                Create Note
+              </button>
+            }
+          />
+        )
       ) : (
         <div className="row g-3">
           {notes.map((n) => (

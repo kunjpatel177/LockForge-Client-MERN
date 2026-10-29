@@ -19,9 +19,13 @@ const Vault = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchField, setSearchField] = useState('all');
   const [folderFilter, setFolderFilter] = useState('');
+  const [quickFilter, setQuickFilter] = useState('all');
   const [sort, setSort] = useState('updatedAt');
   const [moveItem, setMoveItem] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [counts, setCounts] = useState({ all: 0, favorites: 0, unassigned: 0, tagged: 0 });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -33,12 +37,36 @@ const Vault = () => {
   const load = async () => {
     if (!vaultUnlocked) { setLoading(false); return; }
     try {
-      const [credRes, folderRes] = await Promise.all([
-        vaultAPI.getAll({ search: debouncedSearch, folderId: folderFilter, sort, order: 'desc' }),
+      const params = {
+        search: debouncedSearch,
+        searchField,
+        sort: sort === 'serviceNameDesc' ? 'serviceName' : sort,
+        order: sort === 'serviceName' ? 'asc' : 'desc',
+      };
+      if (folderFilter === 'unassigned') {
+        params.unassigned = 'true';
+      } else if (folderFilter) {
+        params.folderId = folderFilter;
+      }
+      if (quickFilter === 'favorites') params.favorite = 'true';
+      if (quickFilter === 'unassigned') params.unassigned = 'true';
+      if (quickFilter === 'tagged') params.hasTags = 'true';
+
+      const [credRes, folderRes, baselineRes] = await Promise.all([
+        vaultAPI.getAll(params),
         folderAPI.getAll(),
+        vaultAPI.getAll({}),
       ]);
       setCredentials(credRes.data.data);
       setFolders(folderRes.data.data);
+      const allCreds = baselineRes.data.data || [];
+      setTotalCount(allCreds.length);
+      setCounts({
+        all: allCreds.length,
+        favorites: allCreds.filter((c) => c.isFavorite).length,
+        unassigned: allCreds.filter((c) => !c.folderId).length,
+        tagged: allCreds.filter((c) => Array.isArray(c.tags) && c.tags.length > 0).length,
+      });
     } catch (err) {
       showApiError(err);
     } finally {
@@ -46,7 +74,20 @@ const Vault = () => {
     }
   };
 
-  useEffect(() => { load(); }, [vaultUnlocked, debouncedSearch, folderFilter, sort]);
+  useEffect(() => {
+    load();
+  }, [vaultUnlocked, debouncedSearch, searchField, folderFilter, quickFilter, sort]);
+
+  const clearFilters = () => {
+    setSearch('');
+    setDebouncedSearch('');
+    setSearchField('all');
+    setFolderFilter('');
+    setQuickFilter('all');
+    setSort('updatedAt');
+  };
+
+  const isFiltered = Boolean(search || searchField !== 'all' || folderFilter || quickFilter !== 'all' || sort !== 'updatedAt');
 
   const handleDelete = async (id) => {
     const ok = await confirm({
@@ -172,28 +213,151 @@ const Vault = () => {
       />
 
       <div className="dash-filter-bar">
+        {/* Main Search Input */}
         <div className="dash-search-wrap">
           <i className="fas fa-search" />
-          <input className="form-control" placeholder="Search credentials..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input
+            className="form-control"
+            placeholder={
+              searchField === 'service'
+                ? 'Search by service name...'
+                : searchField === 'username_email'
+                ? 'Search by username or email...'
+                : searchField === 'url'
+                ? 'Search by website URL or domain...'
+                : searchField === 'tags'
+                ? 'Search by tag...'
+                : searchField === 'notes'
+                ? 'Search within notes...'
+                : 'Search credentials (service, username, email, url, tags, notes)...'
+            }
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button
+              type="button"
+              className="dash-search-clear"
+              onClick={() => setSearch('')}
+              title="Clear search"
+            >
+              <i className="fas fa-times" />
+            </button>
+          )}
         </div>
-        <select className="form-select" style={{ maxWidth: 200 }} value={folderFilter} onChange={(e) => setFolderFilter(e.target.value)}>
-          <option value="">All Folders</option>
-          {folders.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+
+        {/* Search Scope Target */}
+        <select
+          className="form-select"
+          style={{ maxWidth: 175 }}
+          value={searchField}
+          onChange={(e) => setSearchField(e.target.value)}
+          title="Search Scope"
+        >
+          <option value="all">🔍 All Fields</option>
+          <option value="service">🏷️ Service Name</option>
+          <option value="username_email">👤 Username / Email</option>
+          <option value="url">🌐 Website / URL</option>
+          <option value="tags">🔖 Tags</option>
+          <option value="notes">📝 Notes</option>
         </select>
-        <select className="form-select" style={{ maxWidth: 200 }} value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="updatedAt">Recently Updated</option>
-          <option value="serviceName">Service Name</option>
-          <option value="createdAt">Date Created</option>
+
+        {/* Folder Filter */}
+        <select
+          className="form-select"
+          style={{ maxWidth: 165 }}
+          value={folderFilter}
+          onChange={(e) => setFolderFilter(e.target.value)}
+        >
+          <option value="">📁 All Folders</option>
+          <option value="unassigned">📂 Unassigned</option>
+          {folders.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.name}
+            </option>
+          ))}
         </select>
+
+        {/* Sorting */}
+        <select
+          className="form-select"
+          style={{ maxWidth: 175 }}
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+        >
+          <option value="updatedAt">⚡ Recently Updated</option>
+          <option value="serviceName">🔤 Service Name (A-Z)</option>
+          <option value="serviceNameDesc">🔤 Service Name (Z-A)</option>
+          <option value="createdAt">🕒 Date Created</option>
+          <option value="favoriteFirst">⭐ Favorites First</option>
+        </select>
+
+        {/* Quick Filter Pills */}
+        <div className="search-filter-pills">
+          <button
+            type="button"
+            className={`search-filter-pill ${quickFilter === 'all' ? 'active' : ''}`}
+            onClick={() => setQuickFilter('all')}
+          >
+            All <span className="opacity-75">({counts.all})</span>
+          </button>
+          <button
+            type="button"
+            className={`search-filter-pill ${quickFilter === 'favorites' ? 'active' : ''}`}
+            onClick={() => setQuickFilter('favorites')}
+          >
+            <i className="fas fa-star text-warning" /> Favorites <span className="opacity-75">({counts.favorites})</span>
+          </button>
+          <button
+            type="button"
+            className={`search-filter-pill ${quickFilter === 'unassigned' ? 'active' : ''}`}
+            onClick={() => setQuickFilter('unassigned')}
+          >
+            <i className="fas fa-folder-open" /> Unassigned <span className="opacity-75">({counts.unassigned})</span>
+          </button>
+          <button
+            type="button"
+            className={`search-filter-pill ${quickFilter === 'tagged' ? 'active' : ''}`}
+            onClick={() => setQuickFilter('tagged')}
+          >
+            <i className="fas fa-tags" /> Tagged <span className="opacity-75">({counts.tagged})</span>
+          </button>
+        </div>
+
+        {/* Result Counter & Reset */}
+        {isFiltered && (
+          <div className="search-result-info">
+            <span>
+              Showing <strong>{credentials.length}</strong> of <strong>{totalCount}</strong> credential{totalCount !== 1 ? 's' : ''}
+              {search && <span> matching &quot;{search}&quot;</span>}
+            </span>
+            <button type="button" className="btn btn-link" onClick={clearFilters}>
+              <i className="fas fa-rotate-left me-1" />Reset Filters
+            </button>
+          </div>
+        )}
       </div>
 
       {credentials.length === 0 ? (
-        <EmptyState
-          icon="fa-vault"
-          title="No credentials yet"
-          description="Start building your secure vault by adding your first login."
-          action={<Link to="/vault/add" className="btn btn-primary btn-modern">Add Credential</Link>}
-        />
+        isFiltered ? (
+          <EmptyState
+            icon="fa-magnifying-glass"
+            title="No credentials found"
+            description="No items match your active search and filter criteria. Try adjusting your query or resetting filters."
+            action={
+              <button type="button" className="btn btn-outline-primary btn-modern" onClick={clearFilters}>
+                <i className="fas fa-rotate-left me-1" />Clear All Filters
+              </button>
+            }
+          />
+        ) : (
+          <EmptyState
+            icon="fa-vault"
+            title="No credentials yet"
+            description="Start building your secure vault by adding your first login."
+            action={<Link to="/vault/add" className="btn btn-primary btn-modern">Add Credential</Link>}
+          />
+        )
       ) : (
         <div className="modern-table-wrap vault-table-wrap table-responsive">
           <table className="table table-hover mb-0 vault-table">
