@@ -45,28 +45,34 @@ const Home = () => {
 
   const features = [
     { icon: 'fa-vault', title: 'Encrypted Vault', desc: 'Every credential is encrypted with AES-256-GCM before it ever touches the database. Unlock with your master password.', color: 'indigo' },
-    { icon: 'fa-mobile-screen-button', title: 'Two-Factor Auth', desc: 'Protect your account with authenticator app codes, email OTP, or both — enable and manage methods individually.', color: 'violet' },
-    { icon: 'fa-folder-tree', title: 'Folders & Organization', desc: 'Group credentials and notes in folders, move items in bulk, assign entries, and export folder-wise PDF reports.', color: 'cyan' },
-    { icon: 'fa-sticky-note', title: 'Secure Notes', desc: 'Store encrypted notes for recovery phrases, Wi-Fi details, and private memos — searchable from your vault.', color: 'rose' },
-    { icon: 'fa-heart-pulse', title: 'Password Health', desc: 'Security Dashboard scores your vault and flags weak, reused, and outdated passwords instantly.', color: 'amber' },
-    { icon: 'fa-cloud-arrow-up', title: 'Backup & PDF Export', desc: 'Export encrypted backups, restore your vault, or generate watermarked PDF exports with master password verification.', color: 'emerald' },
-    { icon: 'fa-desktop', title: 'Session Control', desc: 'View active devices, revoke sessions remotely, and keep vault keys bound to your login session.', color: 'indigo' },
+    { icon: 'fa-eye-slash', title: 'Hidden Items (Secret Vault)', desc: 'Conceal highly confidential credentials, notes, and folders behind master password re-authentication with complete isolation.', color: 'rose' },
+    { icon: 'fa-mobile-screen-button', title: 'Two-Factor Auth', desc: 'Protect your account with authenticator app codes (TOTP), email OTP, or both — enable and manage methods individually.', color: 'violet' },
+    { icon: 'fa-folder-tree', title: 'Folders & Organization', desc: 'Group credentials and notes in folders, move items in bulk, assign entries, and export password-protected PDF reports.', color: 'cyan' },
+    { icon: 'fa-magnifying-glass', title: 'Multi-Field Advanced Search', desc: 'Target searches across services, usernames, emails, URLs, tags, notes, or all fields instantly in your vault.', color: 'amber' },
+    { icon: 'fa-sticky-note', title: 'Secure Notes', desc: 'Store encrypted notes for recovery phrases, Wi-Fi details, and private memos — searchable from your vault.', color: 'indigo' },
+    { icon: 'fa-heart-pulse', title: 'Security Health & Weekly Alerts', desc: 'Security Dashboard detects weak and reused passwords. Automatic weekly email digests alert you until vulnerabilities are resolved.', color: 'rose' },
+    { icon: 'fa-file-pdf', title: 'Password-Protected PDF Export', desc: 'Export credentials into an encrypted, password-protected PDF that strictly requires your master password to open.', color: 'emerald' },
+    { icon: 'fa-cloud-arrow-up', title: 'Smart Backup & Restore', desc: 'Export encrypted backups and restore anytime: choose between full replacement or smart-merge without overwriting unconflicted data.', color: 'cyan' },
+    { icon: 'fa-desktop', title: 'Session & Sign-In Alerts', desc: 'View active devices, revoke sessions remotely, and receive real-time email notifications with IP, device, and geolocation upon sign-in.', color: 'indigo' },
     { icon: 'fa-clock-rotate-left', title: 'Activity Logs', desc: 'Full audit trail of logins, credential changes, exports, email updates, and security events — no secrets logged.', color: 'violet' },
-    { icon: 'fa-trash-arrow-up', title: 'Trash & Recovery', desc: 'Soft-delete credentials with restore support. Empty trash only when you are ready to remove data permanently.', color: 'cyan' },
+    { icon: 'fa-trash-arrow-up', title: 'Trash & Item Lifecycle', desc: 'Soft-delete credentials, secure notes, and entire folders with full restore support or permanent emptying when ready.', color: 'amber' },
   ];
 
   const steps = [
     { num: '01', title: 'Create your account', desc: 'Sign up with email verification, set a strong account password, and choose your master password — the key to your vault.' },
     { num: '02', title: 'Secure & unlock', desc: 'Enable two-factor authentication, unlock your vault with PBKDF2-derived keys, and configure auto-lock in Settings.' },
-    { num: '03', title: 'Store & organize', desc: 'Add credentials, secure notes, and custom fields. Organize with folders, tags, favorites, and bulk move tools.' },
-    { num: '04', title: 'Monitor & protect', desc: 'Review password health, activity logs, and active sessions. Export backups or PDFs and update your email anytime.' },
+    { num: '03', title: 'Store & organize', desc: 'Add credentials, secure notes, and custom fields. Organize with folders, tags, favorites, and hide sensitive items in your secret vault.' },
+    { num: '04', title: 'Monitor & protect', desc: 'Track password health with automated weekly audits, review sign-in activity, and export password-protected backups anytime.' },
   ];
 
   const faqs = [
-    { q: 'Is my master password stored anywhere?', a: 'No. Only a cryptographic verifier is stored to validate unlock attempts. Your actual master password never leaves your session.' },
+    { q: 'Is my master password stored anywhere?', a: 'No. Only a cryptographic HMAC verifier is stored to validate unlock attempts. Your actual master password never leaves your session and is never stored in plaintext.' },
     { q: 'What two-factor options are supported?', a: 'LockForge supports authenticator app (TOTP) codes and email OTP. You can enable one or both, and add or remove methods anytime from Settings.' },
-    { q: 'What happens if I forget my master password?', a: 'Your master password cannot be recovered — by design. This ensures only you can access your encrypted vault.' },
-    { q: 'Can I export or change my email?', a: 'Yes. Export encrypted backups or watermarked PDFs from Backup & Restore. Change your registered email from Profile with password confirmation and a verification link.' },
+    { q: 'How does the Password-Protected PDF export work?', a: 'When you export your vault or folders as a PDF, the resulting document is encrypted with your master password. Opening the PDF requires entering your master password in any standard PDF reader.' },
+    { q: 'What are Hidden Items and how do they work?', a: 'Hidden Items allow you to conceal specific credentials, folders, or secure notes. They vanish from regular views and are only accessible by entering your master password in the Hidden Items view.' },
+    { q: 'What is Smart Merge vs Full Replace during backup restore?', a: 'Full Replace wipes current vault data and restores the backup. Smart Merge replaces only matching items (same service/folder/note) and imports missing items without deleting your existing vault data.' },
+    { q: 'Why do I receive weekly security digest emails?', a: 'If your vault contains weak or reused passwords, LockForge sends an automated weekly security digest with a direct link to your Security Dashboard. Once you replace all weak and reused passwords, these alerts automatically stop.' },
+    { q: 'What happens if I forget my master password?', a: 'Because LockForge uses cryptographic key derivation from your master password, your master password cannot be recovered by anyone — by design. This ensures that only you can access your encrypted data.' },
   ];
 
   return (
@@ -270,16 +276,18 @@ const Home = () => {
               </thead>
               <tbody>
                 {[
-                  ['AES-256-GCM Encryption', true, false, false],
-                  ['Two-Factor Authentication', true, false, false],
-                  ['Password Health Monitoring', true, false, false],
-                  ['Secure Notes & Custom Fields', true, false, false],
-                  ['Folder Organization & PDF Export', true, false, false],
-                  ['Activity Audit Logs', true, false, false],
-                  ['Encrypted Backup/Restore', true, false, false],
-                  ['Session Management', true, false, false],
-                  ['Master Password Protection', true, false, false],
-                  ['Trash & Credential Recovery', true, false, false],
+                  ['AES-256-GCM Vault Encryption', true, false, false],
+                  ['Two-Factor Authentication (TOTP & Email)', true, false, false],
+                  ['Hidden Items & Secret Vault', true, false, false],
+                  ['Password-Protected PDF Export', true, false, false],
+                  ['Automated Weekly Security Health Digest', true, false, false],
+                  ['Multi-Field Advanced Search', true, false, false],
+                  ['Smart Merge & Backup Restore', true, false, false],
+                  ['Real-Time Sign-In Location Alerts', true, false, false],
+                  ['Folders & Secure Notes Management', true, false, false],
+                  ['Trash & Full Recovery Lifecycle', true, false, false],
+                  ['Activity Audit Logs & Session Revocation', true, false, false],
+                  ['Zero Plaintext Password Storage', true, false, false],
                 ].map(([cap, lf, browser, plain]) => (
                   <tr key={cap}>
                     <td>{cap}</td>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import PasswordInput from '../../components/PasswordInput';
 import BrandLogo from '../../components/BrandLogo';
 import { useAuth } from '../../context/AuthContext';
@@ -16,6 +16,8 @@ const Login = () => {
   const [resending, setResending] = useState(false);
   const { login, verifyTwoFactor, resendTwoFactor } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const destination = location.state?.from?.pathname || '/dashboard';
 
   const hasEmail = twoFactorMethods.includes('email');
   const hasTotp = twoFactorMethods.includes('totp');
@@ -41,7 +43,7 @@ const Login = () => {
         return;
       }
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      navigate(destination);
     } catch (err) {
       const { message, status } = handleApiError(err);
       toast.error(status === 429 ? 'Too many attempts. Please wait.' : message);
@@ -56,7 +58,7 @@ const Login = () => {
     try {
       await verifyTwoFactor(twoFactorToken, code);
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      navigate(destination);
     } catch (err) {
       const { message, status } = handleApiError(err);
       toast.error(status === 429 ? 'Too many attempts. Please wait.' : message);

@@ -8,13 +8,17 @@ const Security = () => {
     { icon: 'fa-microchip', title: 'Key Derivation (PBKDF2)', desc: 'PBKDF2 with SHA-512 and 310,000 iterations derives encryption keys from your master password and a unique per-user salt, making brute-force attacks computationally infeasible.', tag: 'KDF' },
     { icon: 'fa-fingerprint', title: 'Argon2id Password Hashing', desc: 'Account login passwords are hashed with Argon2id — a memory-hard algorithm designed to resist GPU, ASIC, and side-channel attacks.', tag: 'Auth' },
     { icon: 'fa-mobile-screen-button', title: 'Two-Factor Authentication', desc: 'Optional TOTP (authenticator app) and email OTP protect your account at login. Enable one or both methods and manage them individually from Settings.', tag: '2FA' },
+    { icon: 'fa-eye-slash', title: 'Hidden Vault Isolation', desc: 'Sensitive credentials, notes, and folders can be moved into a secret hidden vault requiring master password re-authentication. Items remain hidden during imports/exports.', tag: 'Privacy' },
+    { icon: 'fa-file-pdf', title: 'Password-Protected PDF Export', desc: 'Exported vault and folder PDF documents are encrypted with your master password, preventing unauthorized access even if the offline file is shared.', tag: 'Offline' },
+    { icon: 'fa-bell', title: 'Weekly Vulnerability Audits', desc: 'Background security audits evaluate weak and reused passwords, dispatching weekly security digest alerts to your email until all vulnerabilities are corrected.', tag: 'Audit' },
+    { icon: 'fa-location-dot', title: 'Geographic Sign-In Alerts', desc: 'Instant email notifications on every login featuring UTC timestamp, IP address, estimated city/country geolocation, and browser/device fingerprint.', tag: 'Alerts' },
     { icon: 'fa-envelope-circle-check', title: 'Email Verification & Change', desc: 'Signup email verification, resend support, and secure email change with password confirmation plus a verification link sent to the new address.', tag: 'Identity' },
     { icon: 'fa-ticket', title: 'JWT Session Management', desc: 'Short-lived access tokens (15 min) and refresh tokens (7 days) with HTTP-only cookies and Bearer token fallback for reliable SPA authentication.', tag: 'Sessions' },
     { icon: 'fa-desktop', title: 'Active Session Control', desc: 'View all active sessions with device info, browser, IP address, and last activity. Revoke individual sessions or logout all devices instantly.', tag: 'Control' },
     { icon: 'fa-unlock-keyhole', title: 'Session-Bound Vault Keys', desc: 'Vault encryption keys are tied to your authenticated session in the database — not held in volatile server memory — so production deployments stay consistent and secure.', tag: 'Vault' },
     { icon: 'fa-gauge-high', title: 'Rate Limiting', desc: 'Authentication endpoints are rate-limited to prevent brute-force attacks. Login, register, and 2FA verification have dedicated throttling limits.', tag: 'Defense' },
     { icon: 'fa-shield-virus', title: 'CSRF & XSS Protection', desc: 'Helmet security headers, input validation, sanitized error responses, and SameSite cookies protect against cross-site scripting and request forgery.', tag: 'Web' },
-    { icon: 'fa-eye-slash', title: 'Zero Sensitive Logging', desc: 'Passwords, encryption keys, decrypted credentials, OTP codes, and tokens are never written to logs, error responses, or activity records.', tag: 'Privacy' },
+    { icon: 'fa-database', title: 'Zero Sensitive Logging', desc: 'Passwords, encryption keys, decrypted credentials, OTP codes, and tokens are never written to logs, error responses, or activity records.', tag: 'Privacy' },
   ];
 
   const layers = [
@@ -22,7 +26,9 @@ const Security = () => {
     { layer: 'Authentication', tech: 'Argon2id + JWT + 2FA', desc: 'Memory-hard password hashing, short-lived tokens, and optional TOTP or email OTP.' },
     { layer: 'Vault Encryption', tech: 'AES-256-GCM', desc: 'Authenticated encryption with unique IVs and auth tags per field.' },
     { layer: 'Key Derivation', tech: 'PBKDF2-SHA512', desc: '310,000 iterations with per-user salt for key stretching.' },
+    { layer: 'Offline Security', tech: 'Password-Protected PDF', desc: 'Exported PDFs encrypted with your master password.' },
     { layer: 'Session Vault Keys', tech: 'Encrypted Session Store', desc: 'Vault keys persisted per session — survives serverless restarts without exposing plaintext.' },
+    { layer: 'Threat Monitoring', tech: 'Weekly Audits & Geo-Alerts', desc: 'Weekly email digests for weak/reused passwords and instant login alerts with IP geolocation.' },
     { layer: 'Database', tech: 'MongoDB', desc: 'Only encrypted ciphertext stored. No plaintext secrets ever persisted.' },
     { layer: 'API Security', tech: 'Helmet + CORS + Rate Limit', desc: 'Security headers, origin validation, and request throttling on sensitive routes.' },
   ];
@@ -31,12 +37,13 @@ const Security = () => {
     'Use a unique, strong master password you don\'t use anywhere else',
     'Enable two-factor authentication — TOTP, email OTP, or both',
     'Enable vault auto-lock after periods of inactivity in Settings',
-    'Regularly review your Security Dashboard for weak or reused passwords',
+    'Review your Security Dashboard and weekly audit emails to replace weak or reused passwords',
+    'Use the Hidden Items vault to isolate high-risk credentials, notes, and folders',
+    'Store password-protected exported PDFs safely offline and never share your master password',
     'Revoke unknown sessions immediately from the Sessions page',
-    'Export encrypted backups periodically and store them securely offline',
+    'Export encrypted backups periodically and use Smart Merge when restoring data',
     'Verify your email and use the secure email change flow if your address changes',
-    'Never share your master password or account credentials',
-    'Review activity logs for unauthorized access or export attempts',
+    'Review sign-in email notifications and activity logs for suspicious access attempts',
   ];
 
   return (

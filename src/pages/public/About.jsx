@@ -14,16 +14,16 @@ const About = () => {
   ];
 
   const techStack = [
-    { category: 'Frontend', items: ['React 19', 'Vite', 'React Router', 'Bootstrap 5', 'Axios'] },
-    { category: 'Backend', items: ['Node.js', 'Express.js', 'Mongoose', 'JWT', 'Helmet'] },
-    { category: 'Security', items: ['AES-256-GCM', 'Argon2id', 'PBKDF2', 'TOTP & Email 2FA', 'Rate Limiting'] },
-    { category: 'Database', items: ['MongoDB', 'Indexed Queries', 'Encrypted Fields', 'Session Store', 'Activity Logs'] },
+    { category: 'Frontend', items: ['React 19', 'Vite', 'React Router', 'Bootstrap 5', 'Axios', 'FontAwesome'] },
+    { category: 'Backend', items: ['Node.js', 'Express.js', 'Mongoose', 'JWT', 'Helmet', 'Nodemailer'] },
+    { category: 'Security', items: ['AES-256-GCM', 'Argon2id', 'PBKDF2-SHA512', 'TOTP & Email 2FA', 'PDF Encryption', 'Rate Limiting'] },
+    { category: 'Defense & Auditing', items: ['Weekly Security Audits', 'Geo-Located Sign-In Alerts', 'Hidden Vault Isolation', 'Smart Merge Restore', 'Activity Logs'] },
   ];
 
   const milestones = [
     { year: '2024', title: 'Concept & Architecture', desc: 'Security-first design with separated auth and vault encryption layers.' },
     { year: '2025', title: 'Core Platform Launch', desc: 'Full vault management, folders, secure notes, password health, backup/restore, and activity logging.' },
-    { year: '2026', title: 'LockForge 1.0', desc: 'Two-factor auth (TOTP + email), email change, folder assign/move, PDF export, session-bound vault keys, trash recovery, and production deployment.' },
+    { year: '2026', title: 'LockForge 1.0 Production Release', desc: 'Two-factor auth (TOTP + email), Hidden Items secret vault, password-protected PDF exports, smart-merge backups, weekly vulnerability digests, multi-field search, sign-in location alerts, and full trash lifecycle.' },
     { year: 'Future', title: 'What\'s Next', desc: 'Browser extension, team vaults, hardware key support, and mobile apps.' },
   ];
 
@@ -50,8 +50,9 @@ const About = () => {
               </p>
               <p className="text-muted mb-4">
                 We built LockForge as a complete MERN application demonstrating production-grade security
-                patterns: authenticated encryption, memory-hard hashing, two-factor authentication,
-                session management, audit logging, encrypted backup, PDF export, and secure email change —
+                patterns: authenticated AES-256-GCM encryption, memory-hard hashing, dual two-factor authentication,
+                session management, real-time geo-located sign-in alerts, automated weekly security audits,
+                smart-merge backups, password-protected PDF exports, and secret vault isolation —
                 all wrapped in a modern, responsive interface.
               </p>
               <Link to="/security" className="btn btn-primary btn-modern">Explore Our Security</Link>
