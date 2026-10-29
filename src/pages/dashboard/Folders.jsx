@@ -76,6 +76,22 @@ const Folders = () => {
     } catch (err) { toast.error(handleApiError(err).message); }
   };
 
+  const handleDeleteAll = async () => {
+    const ok = await confirm({
+      title: 'Delete All Folders',
+      message: `Move all ${folders.length} folders to trash? Any credentials and notes inside will be preserved, and you can restore folders anytime from Trash.`,
+      confirmLabel: 'Move all to trash',
+      variant: 'danger',
+      icon: 'fa-trash',
+    });
+    if (!ok) return;
+    try {
+      await folderAPI.deleteAll({ permanent: false });
+      toast.success('All folders moved to trash');
+      load();
+    } catch (err) { toast.error(handleApiError(err).message); }
+  };
+
   const handleHideFolder = async (folderId, name, e) => {
     e.stopPropagation();
     const ok = await confirm({
@@ -114,6 +130,17 @@ const Folders = () => {
         icon="fa-folder"
         title="Folders"
         subtitle="Organize credentials and notes into collections"
+        actions={
+          folders.length > 0 && (
+            <button
+              type="button"
+              className="btn btn-outline-danger btn-modern btn-sm"
+              onClick={handleDeleteAll}
+            >
+              <i className="fas fa-trash me-1" />Delete All
+            </button>
+          )
+        }
       />
 
       <form onSubmit={handleCreate} className="folder-create-bar mb-4">

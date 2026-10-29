@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { userAPI } from '../../api';
+import { userAPI, vaultAPI, noteAPI, folderAPI } from '../../api';
 import { handleApiError } from '../../api/axios';
 import { toast } from 'react-toastify';
 import DashboardPageHeader from '../../components/DashboardPageHeader';
@@ -23,6 +23,79 @@ const Settings = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [showPurgeModal, setShowPurgeModal] = useState(false);
+  const [purgePassword, setPurgePassword] = useState('');
+  const [purging, setPurging] = useState(false);
+
+  const handleDeleteAllCredentials = async () => {
+    const ok = await confirm({
+      title: 'Delete All Credentials',
+      message: 'Move all credentials to trash? You can restore them anytime from Trash.',
+      confirmLabel: 'Move all to trash',
+      variant: 'danger',
+      icon: 'fa-key',
+    });
+    if (!ok) return;
+    try {
+      await vaultAPI.deleteAll({ permanent: false });
+      toast.success('All credentials moved to trash');
+    } catch (err) { toast.error(handleApiError(err).message); }
+  };
+
+  const handleDeleteAllNotes = async () => {
+    const ok = await confirm({
+      title: 'Delete All Secure Notes',
+      message: 'Move all secure notes to trash? You can restore them anytime from Trash.',
+      confirmLabel: 'Move all to trash',
+      variant: 'danger',
+      icon: 'fa-sticky-note',
+    });
+    if (!ok) return;
+    try {
+      await noteAPI.deleteAll({ permanent: false });
+      toast.success('All secure notes moved to trash');
+    } catch (err) { toast.error(handleApiError(err).message); }
+  };
+
+  const handleDeleteAllFolders = async () => {
+    const ok = await confirm({
+      title: 'Delete All Folders',
+      message: 'Move all folders to trash? Any credentials and notes inside will be preserved, and you can restore folders anytime from Trash.',
+      confirmLabel: 'Move all to trash',
+      variant: 'danger',
+      icon: 'fa-folder',
+    });
+    if (!ok) return;
+    try {
+      await folderAPI.deleteAll({ permanent: false });
+      toast.success('All folders moved to trash');
+    } catch (err) { toast.error(handleApiError(err).message); }
+  };
+
+  const closePurgeModal = () => {
+    if (purging) return;
+    setShowPurgeModal(false);
+    setPurgePassword('');
+  };
+
+  const handlePurgeVault = async () => {
+    if (!purgePassword.trim()) {
+      toast.error('Enter your password to confirm');
+      return;
+    }
+    setPurging(true);
+    try {
+      await vaultAPI.purgeAll({ masterPassword: purgePassword.trim(), password: purgePassword.trim() });
+      toast.success('All credentials, folders, and notes permanently cleared');
+      setShowPurgeModal(false);
+      setPurgePassword('');
+      refreshProfile?.();
+    } catch (err) {
+      toast.error(handleApiError(err).message);
+    } finally {
+      setPurging(false);
+    }
+  };
 
   const handleLogout = async () => {
     const ok = await confirm({
@@ -199,25 +272,91 @@ const Settings = () => {
               <div className="settings-card-icon danger"><i className="fas fa-triangle-exclamation" /></div>
               <div>
                 <h5 className="fw-bold mb-0 text-danger">Danger Zone</h5>
-                <small className="text-muted">Irreversible account actions</small>
+                <small className="text-muted">Irreversible vault and account actions</small>
               </div>
             </div>
             <div className="settings-card-body">
-              <p className="text-muted mb-3">
-                Permanently delete your account and all vault data, folders, notes, sessions, and activity logs.
-                This action cannot be undone.
-              </p>
-              <button
-                type="button"
-                className="btn btn-outline-danger btn-modern"
-                onClick={() => setShowDeleteModal(true)}
-              >
-                <i className="fas fa-user-xmark me-2" />Delete Account
-              </button>
+              {/* Vault Data Purge */}
+              <div className="mb-4 pb-4 border-bottom">
+                <h6 className="fw-bold mb-1 text-danger">Purge Vault Data</h6>
+                <p className="text-muted small mb-3">
+                  Permanently delete all credentials, folders, and secure notes from your vault while keeping your LockForge account active.
+                </p>
+                <div className="d-flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger btn-modern btn-sm"
+                    onClick={() => setShowPurgeModal(true)}
+                  >
+                    <i className="fas fa-trash-can me-1" />Clear All Vault Data
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost text-danger btn-modern btn-sm"
+                    onClick={handleDeleteAllCredentials}
+                  >
+                    <i className="fas fa-key me-1" />Delete All Credentials
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost text-danger btn-modern btn-sm"
+                    onClick={handleDeleteAllNotes}
+                  >
+                    <i className="fas fa-sticky-note me-1" />Delete All Notes
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost text-danger btn-modern btn-sm"
+                    onClick={handleDeleteAllFolders}
+                  >
+                    <i className="fas fa-folder me-1" />Delete All Folders
+                  </button>
+                </div>
+              </div>
+
+              {/* Account Deletion */}
+              <div>
+                <h6 className="fw-bold mb-1 text-danger">Delete Account</h6>
+                <p className="text-muted small mb-3">
+                  Permanently delete your account along with all vault data, folders, notes, sessions, and activity logs. This action cannot be undone.
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-outline-danger btn-modern"
+                  onClick={() => setShowDeleteModal(true)}
+                >
+                  <i className="fas fa-user-xmark me-2" />Delete Account
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        show={showPurgeModal}
+        title="Clear All Vault Data"
+        message="Enter your Master Password or Account Password to permanently clear all credentials, folders, and secure notes from your vault. Your account will remain active, but your vault contents will be permanently erased."
+        confirmLabel="Permanently Clear All Vault Data"
+        variant="danger"
+        icon="fa-trash-can"
+        loading={purging}
+        onClose={closePurgeModal}
+        onConfirm={handlePurgeVault}
+      >
+        <div className="mb-0">
+          <label className="form-label" htmlFor="purge-vault-password">Master or Account Password</label>
+          <PasswordInput
+            id="purge-vault-password"
+            className="form-control form-control-modern"
+            value={purgePassword}
+            onChange={(e) => setPurgePassword(e.target.value)}
+            placeholder="Enter password to confirm"
+            autoFocus
+            required
+          />
+        </div>
+      </ConfirmModal>
 
       <ConfirmModal
         show={showDeleteModal}

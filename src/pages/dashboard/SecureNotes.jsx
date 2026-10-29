@@ -105,6 +105,22 @@ const SecureNotes = () => {
     } catch (err) { showApiError(err); }
   };
 
+  const handleDeleteAll = async () => {
+    const ok = await confirm({
+      title: 'Delete All Secure Notes',
+      message: `Move all ${notes.length} secure notes to trash? You can restore them anytime from Trash.`,
+      confirmLabel: 'Move all to trash',
+      variant: 'danger',
+      icon: 'fa-trash',
+    });
+    if (!ok) return;
+    try {
+      await noteAPI.deleteAll({ permanent: false });
+      toast.success('All secure notes moved to trash');
+      load();
+    } catch (err) { showApiError(err); }
+  };
+
   const handleHide = async (id, title) => {
     const ok = await confirm({
       title: 'Hide Secure Note',
@@ -160,13 +176,24 @@ const SecureNotes = () => {
         title="Secure Notes"
         subtitle="Store encrypted text for sensitive information"
         actions={
-          <button
-            type="button"
-            className="btn btn-primary btn-modern"
-            onClick={() => { setShowForm(true); setEditing(null); setForm({ title: '', content: '', folderId: '', isFavorite: false }); }}
-          >
-            <i className="fas fa-plus me-1" />New Note
-          </button>
+          <div className="d-flex gap-2">
+            {notes.length > 0 && (
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-modern"
+                onClick={handleDeleteAll}
+              >
+                <i className="fas fa-trash me-1" />Delete All
+              </button>
+            )}
+            <button
+              type="button"
+              className="btn btn-primary btn-modern"
+              onClick={() => { setShowForm(true); setEditing(null); setForm({ title: '', content: '', folderId: '', isFavorite: false }); }}
+            >
+              <i className="fas fa-plus me-1" />New Note
+            </button>
+          </div>
         }
       />
 

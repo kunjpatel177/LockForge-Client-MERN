@@ -14,6 +14,8 @@ const BackupRestore = () => {
   const [masterPassword, setMasterPassword] = useState('');
   const [backupFile, setBackupFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importMode, setImportMode] = useState('smart_merge');
 
   const handleExport = async () => {
     if (!masterPassword) return toast.error('Enter master password');
@@ -24,7 +26,8 @@ const BackupRestore = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `lockforge-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `lockforge-backup-${new Date().toISOString().split('T')[0]}-${new Date().toLocaleTimeString()}.json`;
+      // a.download = `lockforge-backup-${new Date().toLocaleDateString()}-${new Date().toLocaleTimeString()}.json`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success('Backup exported');
@@ -33,26 +36,49 @@ const BackupRestore = () => {
     finally { setLoading(false); }
   };
 
-  const handleImport = async () => {
-    if (!masterPassword || !backupFile) return toast.error('Enter master password and select backup file');
-    const replace = await confirm({
-      title: 'Replace Vault Data?',
-      message: 'Do you want to replace your existing vault data with this backup? Choose Cancel to merge instead.',
-      confirmLabel: 'Replace all',
-      cancelLabel: 'Merge',
-      variant: 'warning',
-      icon: 'fa-file-import',
-    });
+  const handleImport = () => {
+    if (!masterPassword) return toast.error('Enter your master password first');
+    if (!backupFile) return toast.error('Select a backup JSON file first');
+    setShowImportModal(true);
+  };
+
+  const executeImport = async () => {
+    if (!masterPassword || !backupFile) {
+      return toast.error('Enter master password and select backup file');
+    }
     setLoading(true);
     try {
       const text = await backupFile.text();
       const backup = JSON.parse(text);
-      await backupAPI.importBackup({ masterPassword, backup, replace });
-      toast.success('Backup restored');
+      const res = await backupAPI.importBackup({
+        masterPassword,
+        backup,
+        mode: importMode,
+      });
+
+      const summary = res.data?.data?.summary;
+      if (summary) {
+        if (importMode === 'replace_all') {
+          toast.success(
+            `Vault restored! Replaced with ${summary.credentialsCreated} credentials, ${summary.notesCreated} notes, and ${summary.foldersCreated} folders.`
+          );
+        } else {
+          toast.success(
+            `Backup merged! Updated: ${summary.credentialsUpdated} creds, ${summary.notesUpdated} notes. Added: ${summary.credentialsCreated} creds, ${summary.notesCreated} notes.`
+          );
+        }
+      } else {
+        toast.success(res.data?.message || 'Backup restored successfully');
+      }
+
+      setShowImportModal(false);
       setMasterPassword('');
       setBackupFile(null);
-    } catch (err) { toast.error(handleApiError(err).message); }
-    finally { setLoading(false); }
+    } catch (err) {
+      toast.error(handleApiError(err).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePDF = async () => {
@@ -71,7 +97,7 @@ const BackupRestore = () => {
       const url = URL.createObjectURL(res.data);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `lockforge-export-${new Date().toISOString().split('T')[0]}.pdf`;
+      a.download = `lockforge-export-${new Date().toISOString().split('T')[0]}-${new Date().toLocaleTimeString()}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success('PDF exported! Use your Master Password to open it.');
@@ -85,6 +111,124 @@ const BackupRestore = () => {
   return (
     <div>
       {ConfirmDialog}
+
+      {showImportModal && (
+        <div className="modal show d-block confirm-modal-backdrop" tabIndex="-1">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content border-0 shadow">
+              <div className="modal-header border-0 pb-0">
+                <div className="d-flex align-items-center gap-2">
+                  <div className="confirm-modal-icon warning" style={{ width: 36, height: 36, fontSize: 16 }}>
+                    <i className="fas fa-file-import" />
+                  </div>
+                  <div>
+                    <h5 className="modal-title fw-bold mb-0">Select Import Option</h5>
+                    <small className="text-muted">Choose how you want to restore your vault data</small>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowImportModal(false)}
+                  disabled={loading}
+                  aria-label="Close"
+                />
+              </div>
+
+              <div className="modal-body py-4">
+                <div className="d-flex flex-column gap-3">
+                  {/* Option 1: Smart Merge */}
+                  <div
+                    className={`p-3 rounded border ${importMode === 'smart_merge' ? 'border-primary bg-primary-subtle' : 'border-secondary-subtle bg-body'}`}
+                    style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onClick={() => setImportMode('smart_merge')}
+                  >
+                    <div className="d-flex align-items-start gap-3">
+                      <input
+                        type="radio"
+                        name="importMode"
+                        id="modeSmartMerge"
+                        className="form-check-input mt-1"
+                        checked={importMode === 'smart_merge'}
+                        onChange={() => setImportMode('smart_merge')}
+                      />
+                      <div className="flex-grow-1">
+                        <label htmlFor="modeSmartMerge" className="fw-bold mb-1 d-block text-body" style={{ cursor: 'pointer' }}>
+                          <i className="fas fa-arrows-rotate text-primary me-2" />
+                          Option 1: Smart Merge &amp; Replace Matching (Recommended)
+                        </label>
+                        <p className="text-muted small mb-0">
+                          Replaces only credentials with the <strong>same service name</strong>, notes with the <strong>same title</strong>, and folders with the <strong>same folder name</strong>. Also imports missing items. All your other existing vault items remain safe and untouched, and <strong>hidden items stay hidden</strong>.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Option 2: Replace All Data */}
+                  <div
+                    className={`p-3 rounded border ${importMode === 'replace_all' ? 'border-danger bg-danger-subtle' : 'border-secondary-subtle bg-body'}`}
+                    style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onClick={() => setImportMode('replace_all')}
+                  >
+                    <div className="d-flex align-items-start gap-3">
+                      <input
+                        type="radio"
+                        name="importMode"
+                        id="modeReplaceAll"
+                        className="form-check-input mt-1"
+                        checked={importMode === 'replace_all'}
+                        onChange={() => setImportMode('replace_all')}
+                      />
+                      <div className="flex-grow-1">
+                        <label htmlFor="modeReplaceAll" className="fw-bold mb-1 d-block text-danger" style={{ cursor: 'pointer' }}>
+                          <i className="fas fa-triangle-exclamation text-danger me-2" />
+                          Option 2: Replace All Vault Data (Full Wipe &amp; Restore)
+                        </label>
+                        <p className="text-muted small mb-0">
+                          Permanently wipes <strong>all existing credentials, folders, and secure notes</strong> in your vault and replaces them exclusively with the items from this backup file. <strong>Hidden items are restored to their hidden state</strong>.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer border-0 pt-0">
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-modern"
+                  onClick={() => setShowImportModal(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${importMode === 'replace_all' ? 'btn-danger' : 'btn-primary'} btn-modern`}
+                  onClick={executeImport}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" />
+                      Restoring...
+                    </>
+                  ) : importMode === 'replace_all' ? (
+                    <>
+                      <i className="fas fa-triangle-exclamation me-1" />Replace All &amp; Restore
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-arrows-rotate me-1" />Smart Merge &amp; Restore
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <DashboardPageHeader
         icon="fa-cloud-arrow-up"
         title="Backup & Restore"
@@ -111,7 +255,7 @@ const BackupRestore = () => {
           <div className="backup-card">
             <div className="backup-card-icon export"><i className="fas fa-download" /></div>
             <h5 className="fw-bold mb-2">Export Backup</h5>
-            <p className="text-muted small flex-grow-1">Download an encrypted JSON backup of your entire vault for safekeeping.</p>
+            <p className="text-muted small flex-grow-1">Download an encrypted JSON backup of your entire vault (including hidden items) for safekeeping.</p>
             <button type="button" className="btn btn-primary btn-modern" onClick={handleExport} disabled={loading}>
               <i className="fas fa-download me-1" />Export
             </button>
@@ -121,7 +265,7 @@ const BackupRestore = () => {
           <div className="backup-card">
             <div className="backup-card-icon import"><i className="fas fa-upload" /></div>
             <h5 className="fw-bold mb-2">Import Backup</h5>
-            <p className="text-muted small">Restore your vault from a previously exported backup file.</p>
+            <p className="text-muted small">Restore your vault from a previously exported backup file (hidden items stay hidden).</p>
             <input type="file" className="form-control form-control-modern mb-3" accept=".json" onChange={(e) => setBackupFile(e.target.files[0])} />
             <button type="button" className="btn btn-primary btn-modern" onClick={handleImport} disabled={loading}>
               <i className="fas fa-upload me-1" />Import
@@ -138,7 +282,7 @@ const BackupRestore = () => {
               </span>
             </div>
             <p className="text-muted small flex-grow-1">
-              Encrypted folder-wise export of credentials and secure notes. Protected by your Master Password.
+              Encrypted folder-wise export of credentials and secure notes (with hidden badges). Protected by your Master Password.
             </p>
             <button type="button" className="btn btn-outline-primary btn-modern" onClick={handlePDF} disabled={loading}>
               <i className="fas fa-file-pdf me-1" />Export PDF

@@ -63,6 +63,22 @@ const Vault = () => {
     } catch (err) { showApiError(err); }
   };
 
+  const handleDeleteAll = async () => {
+    const ok = await confirm({
+      title: 'Delete All Credentials',
+      message: `Move all ${credentials.length} credentials to trash? You can restore them anytime from Trash.`,
+      confirmLabel: 'Move all to trash',
+      variant: 'danger',
+      icon: 'fa-trash',
+    });
+    if (!ok) return;
+    try {
+      await vaultAPI.deleteAll({ permanent: false });
+      toast.success('All credentials moved to trash');
+      load();
+    } catch (err) { showApiError(err); }
+  };
+
   const handleFavorite = async (id) => {
     try {
       await vaultAPI.toggleFavorite(id);
@@ -138,9 +154,20 @@ const Vault = () => {
         title="Vault"
         subtitle={`${credentials.length} credential${credentials.length !== 1 ? 's' : ''} stored securely`}
         actions={
-          <Link to="/vault/add" className="btn btn-primary btn-modern">
-            <i className="fas fa-plus me-1" />Add Credential
-          </Link>
+          <div className="d-flex gap-2">
+            {credentials.length > 0 && (
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-modern"
+                onClick={handleDeleteAll}
+              >
+                <i className="fas fa-trash me-1" />Delete All
+              </button>
+            )}
+            <Link to="/vault/add" className="btn btn-primary btn-modern">
+              <i className="fas fa-plus me-1" />Add Credential
+            </Link>
+          </div>
         }
       />
 
