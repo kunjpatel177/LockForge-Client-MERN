@@ -52,21 +52,27 @@ export const vaultAPI = {
 
 export const folderAPI = {
   getAll: (params) => api.get('/folders', { params }),
+  getTrash: () => api.get('/folders/trash'),
   getOne: (id) => api.get(`/folders/${id}`),
   create: (name) => api.post('/folders', { name }),
   update: (id, name) => api.put(`/folders/${id}`, { name }),
   assignItems: (id, data) => api.post(`/folders/${id}/assign`, data),
   delete: (id) => api.delete(`/folders/${id}`),
+  restore: (id) => api.post(`/folders/${id}/restore`),
+  permanentDelete: (id) => api.delete(`/folders/${id}/permanent`),
   toggleHide: (id) => api.patch(`/folders/${id}/hide`),
 };
 
 export const noteAPI = {
   getAll: (params) => api.get('/notes', { params }),
+  getTrash: () => api.get('/notes/trash'),
   getOne: (id) => api.get(`/notes/${id}`),
   create: (data) => api.post('/notes', data),
   update: (id, data) => api.put(`/notes/${id}`, data),
   moveToFolder: (id, folderId) => api.patch(`/notes/${id}/folder`, { folderId }),
   delete: (id) => api.delete(`/notes/${id}`),
+  restore: (id) => api.post(`/notes/${id}/restore`),
+  permanentDelete: (id) => api.delete(`/notes/${id}/permanent`),
   toggleHide: (id) => api.patch(`/notes/${id}/hide`),
 };
 

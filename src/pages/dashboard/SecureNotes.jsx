@@ -92,15 +92,15 @@ const SecureNotes = () => {
 
   const handleDelete = async (id) => {
     const ok = await confirm({
-      title: 'Delete Note',
-      message: 'This secure note will be permanently deleted.',
-      confirmLabel: 'Delete note',
-      icon: 'fa-note-sticky',
+      title: 'Move Note to Trash',
+      message: 'This secure note will be moved to trash. You can restore it anytime from Trash.',
+      confirmLabel: 'Move to trash',
+      icon: 'fa-trash',
     });
     if (!ok) return;
     try {
       await noteAPI.delete(id);
-      toast.success('Note deleted');
+      toast.success('Note moved to trash');
       load();
     } catch (err) { showApiError(err); }
   };

@@ -58,11 +58,11 @@ const BackupRestore = () => {
   const handlePDF = async () => {
     if (!masterPassword) return toast.error('Enter master password');
     const ok = await confirm({
-      title: 'Export PDF Warning',
-      message: 'The PDF will contain decrypted credentials and notes organized by folder. Only continue if you understand the security risk.',
-      confirmLabel: 'Export PDF',
-      variant: 'warning',
-      icon: 'fa-file-pdf',
+      title: 'Password-Protected PDF Export',
+      message: 'Your exported PDF will be encrypted and password-protected. You will need to enter your Master Password whenever you open this PDF file.',
+      confirmLabel: 'Export Protected PDF',
+      variant: 'primary',
+      icon: 'fa-file-shield',
     });
     if (!ok) return;
     setLoading(true);
@@ -74,7 +74,7 @@ const BackupRestore = () => {
       a.download = `lockforge-export-${new Date().toISOString().split('T')[0]}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success('PDF exported');
+      toast.success('PDF exported! Use your Master Password to open it.');
       setMasterPassword('');
     } catch (err) { toast.error(handleApiError(err).message); }
     finally { setLoading(false); }
@@ -131,9 +131,16 @@ const BackupRestore = () => {
         <div className="col-md-4">
           <div className="backup-card">
             <div className="backup-card-icon pdf"><i className="fas fa-file-pdf" /></div>
-            <h5 className="fw-bold mb-2">PDF Export</h5>
-            <p className="text-muted small text-danger">Folder-wise export of credentials and secure notes. Handle with extreme care.</p>
-            <button type="button" className="btn btn-outline-danger btn-modern" onClick={handlePDF} disabled={loading}>
+            <h5 className="fw-bold mb-1">PDF Export</h5>
+            <div className="mb-2">
+              <span className="badge bg-primary-subtle text-primary border border-primary-subtle">
+                <i className="fas fa-lock me-1" />Password Protected
+              </span>
+            </div>
+            <p className="text-muted small flex-grow-1">
+              Encrypted folder-wise export of credentials and secure notes. Protected by your Master Password.
+            </p>
+            <button type="button" className="btn btn-outline-primary btn-modern" onClick={handlePDF} disabled={loading}>
               <i className="fas fa-file-pdf me-1" />Export PDF
             </button>
           </div>

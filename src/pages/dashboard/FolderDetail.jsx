@@ -141,18 +141,34 @@ const FolderDetail = () => {
   const handleNoteDelete = async (noteId) => {
     const note = notes.find((n) => n.id === noteId);
     const ok = await confirm({
-      title: 'Delete Note',
-      message: `Delete "${note?.title || 'this note'}" permanently?`,
-      confirmLabel: 'Delete note',
-      icon: 'fa-note-sticky',
+      title: 'Move Note to Trash',
+      message: `Move "${note?.title || 'this note'}" to trash? You can restore it anytime from Trash.`,
+      confirmLabel: 'Move to trash',
+      icon: 'fa-trash',
     });
     if (!ok) return;
     try {
       await noteAPI.delete(noteId);
-      toast.success('Note deleted');
+      toast.success('Note moved to trash');
       setViewNote(null);
       setEditingNote(null);
       load();
+    } catch (err) { showApiError(err); }
+  };
+
+  const handleDeleteFolder = async () => {
+    const ok = await confirm({
+      title: 'Move Folder to Trash',
+      message: `Move folder "${folder?.name}" to trash? You can restore it anytime from Trash.`,
+      confirmLabel: 'Move to trash',
+      variant: 'danger',
+      icon: 'fa-trash',
+    });
+    if (!ok) return;
+    try {
+      await folderAPI.delete(id);
+      toast.success('Folder moved to trash');
+      navigate(folder?.isHidden ? '/hidden' : '/folders');
     } catch (err) { showApiError(err); }
   };
 
@@ -266,6 +282,13 @@ const FolderDetail = () => {
             >
               <i className={`fas ${folder?.isHidden ? 'fa-eye' : 'fa-eye-slash'} me-1`} />
               {folder?.isHidden ? 'Unhide Folder' : 'Hide Folder'}
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-danger btn-modern btn-sm"
+              onClick={handleDeleteFolder}
+            >
+              <i className="fas fa-trash me-1" />Move to Trash
             </button>
             <button type="button" className="btn btn-outline-primary btn-modern btn-sm" onClick={() => setShowAssignModal(true)}>
               <i className="fas fa-list-check me-1" />Add from List

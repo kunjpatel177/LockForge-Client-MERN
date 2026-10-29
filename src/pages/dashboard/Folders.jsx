@@ -63,15 +63,15 @@ const Folders = () => {
   const handleDelete = async (folderId, name, e) => {
     e.stopPropagation();
     const ok = await confirm({
-      title: 'Delete Folder',
-      message: `Delete folder "${name}"? Items inside will be unassigned.`,
-      confirmLabel: 'Delete folder',
-      icon: 'fa-folder-minus',
+      title: 'Move Folder to Trash',
+      message: `Move folder "${name}" to trash? You can restore it anytime from Trash.`,
+      confirmLabel: 'Move to trash',
+      icon: 'fa-trash',
     });
     if (!ok) return;
     try {
       await folderAPI.delete(folderId);
-      toast.success('Folder deleted');
+      toast.success('Folder moved to trash');
       load();
     } catch (err) { toast.error(handleApiError(err).message); }
   };
