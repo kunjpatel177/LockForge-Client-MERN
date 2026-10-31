@@ -1,8 +1,10 @@
+import { Suspense } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PublicNavbar from './PublicNavbar';
 import AuthCTA from './AuthCTA';
 import BrandLogo from './BrandLogo';
+import LoadingSpinner from './LoadingSpinner';
 
 const PublicLayout = () => {
   const { isAuthenticated } = useAuth();
@@ -10,7 +12,11 @@ const PublicLayout = () => {
   return (
     <div className="public-layout">
       <PublicNavbar />
-      <main><Outlet /></main>
+      <main>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Outlet />
+        </Suspense>
+      </main>
       <footer className="footer-modern">
         <div className="container">
           <div className="row g-4 py-5">

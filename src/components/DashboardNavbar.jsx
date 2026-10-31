@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import BrandLogo from './BrandLogo';
@@ -7,14 +8,56 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
   const { user, logout, lockVault, vaultUnlocked } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on route change
+  const [prevPath, setPrevPath] = useState(location.pathname);
+  if (prevPath !== location.pathname) {
+    setPrevPath(location.pathname);
+    setUserDropdownOpen(false);
+  }
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!userDropdownOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setUserDropdownOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [userDropdownOpen]);
+
+  // Close on click outside
+  useEffect(() => {
+    if (!userDropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [userDropdownOpen]);
+
+  const closeDropdown = () => setUserDropdownOpen(false);
 
   const handleLogout = async () => {
+    closeDropdown();
     await logout();
     navigate('/login');
   };
 
   const handleLock = async () => {
+    closeDropdown();
     await lockVault();
+  };
+
+  const handleUnlock = () => {
+    closeDropdown();
+    if (onUnlock) onUnlock();
   };
 
   const initials = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U';
@@ -42,7 +85,6 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
               <BrandLogo size="sm" />
             </span>
             <span className="navbar-brand-name">LockForge</span>
-            {/* <span className="navbar-badge-vault d-none d-sm-inline-flex">VAULT</span> */}
           </Link>
         </div>
 
@@ -76,17 +118,6 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
             </button>
           )}
 
-          {/* Quick Add Button (Desktop/Tablet) */}
-          {/* <Link
-            to="/vault/add"
-            className="btn btn-primary btn-sm navbar-pro-quick-add d-none d-sm-inline-flex"
-            title="Add new credential"
-            aria-label="Add new credential"
-          >
-            <i className="fas fa-plus" />
-            <span className="d-none d-md-inline ms-1">New</span>
-          </Link> */}
-
           {/* Activity Logs Shortcut (Desktop only) */}
           <Link
             to="/activity"
@@ -109,14 +140,14 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
           </button>
 
           {/* User Profile Dropdown */}
-          <div className="dropdown">
+          <div className={`dropdown ${userDropdownOpen ? 'show' : ''}`} ref={dropdownRef}>
             <button
               type="button"
-              className="navbar-pro-user-btn dropdown-toggle"
-              data-bs-toggle="dropdown"
-              data-bs-auto-close="true"
-              aria-expanded="false"
+              className={`navbar-pro-user-btn dropdown-toggle ${userDropdownOpen ? 'show' : ''}`}
+              aria-expanded={userDropdownOpen}
+              aria-haspopup="true"
               aria-label="User account menu"
+              onClick={() => setUserDropdownOpen((prev) => !prev)}
             >
               <div className="navbar-avatar-wrapper">
                 <span className="user-avatar navbar-avatar">{initials}</span>
@@ -129,7 +160,7 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
               <i className="fas fa-chevron-down navbar-user-chevron" />
             </button>
 
-            <div className="dropdown-menu dropdown-menu-end navbar-pro-dropdown">
+            <div className={`dropdown-menu dropdown-menu-end navbar-pro-dropdown ${userDropdownOpen ? 'show' : ''}`}>
               <div className="navbar-dropdown-inner">
                 {/* Dropdown Header Card */}
                 <div className="navbar-dropdown-profile-header">
@@ -174,7 +205,7 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
                       <button
                         type="button"
                         className="btn btn-sm btn-warning w-100 d-flex align-items-center justify-content-center gap-2 text-dark fw-bold navbar-mobile-unlock-btn"
-                        onClick={onUnlock}
+                        onClick={handleUnlock}
                       >
                         <i className="fas fa-unlock-keyhole" />
                         <span>Unlock Vault</span>
@@ -187,6 +218,7 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
                     <Link
                       to="/vault/add"
                       className="btn btn-primary btn-sm w-100 d-flex align-items-center justify-content-center gap-2 navbar-mobile-add-btn"
+                      onClick={closeDropdown}
                     >
                       <i className="fas fa-plus" />
                       <span>New Credential</span>
@@ -217,15 +249,15 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
                 <div className="d-md-none">
                   <div className="navbar-dropdown-section-label">Quick Tools</div>
                   <div className="navbar-mobile-tools-grid">
-                    <Link to="/generator" className="navbar-tool-chip">
+                    <Link to="/generator" className="navbar-tool-chip" onClick={closeDropdown}>
                       <i className="fas fa-wand-magic-sparkles text-primary" />
                       <span>Generator</span>
                     </Link>
-                    <Link to="/notes" className="navbar-tool-chip">
+                    <Link to="/notes" className="navbar-tool-chip" onClick={closeDropdown}>
                       <i className="fas fa-sticky-note text-warning" />
                       <span>Notes</span>
                     </Link>
-                    <Link to="/activity" className="navbar-tool-chip">
+                    <Link to="/activity" className="navbar-tool-chip" onClick={closeDropdown}>
                       <i className="fas fa-clock-rotate-left text-info" />
                       <span>Activity</span>
                     </Link>
@@ -235,19 +267,19 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
 
                 {/* Workspace Navigation */}
                 <div className="navbar-dropdown-section-label">Workspace</div>
-                <Link className="dropdown-item" to="/dashboard">
+                <Link className="dropdown-item" to="/dashboard" onClick={closeDropdown}>
                   <i className="fas fa-gauge-high dropdown-icon" />
                   <span>Dashboard</span>
                 </Link>
-                <Link className="dropdown-item" to="/vault">
+                <Link className="dropdown-item" to="/vault" onClick={closeDropdown}>
                   <i className="fas fa-vault dropdown-icon" />
                   <span>Vault Credentials</span>
                 </Link>
-                <Link className="dropdown-item" to="/hidden">
+                <Link className="dropdown-item" to="/hidden" onClick={closeDropdown}>
                   <i className="fas fa-eye-slash dropdown-icon text-secondary" />
                   <span>Hidden Items</span>
                 </Link>
-                <Link className="dropdown-item" to="/security-dashboard">
+                <Link className="dropdown-item" to="/security-dashboard" onClick={closeDropdown}>
                   <i className="fas fa-shield-halved dropdown-icon text-info" />
                   <span>Security Health</span>
                 </Link>
@@ -256,15 +288,15 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
 
                 {/* Account Settings */}
                 <div className="navbar-dropdown-section-label">Account</div>
-                <Link className="dropdown-item" to="/profile">
+                <Link className="dropdown-item" to="/profile" onClick={closeDropdown}>
                   <i className="fas fa-user-shield dropdown-icon" />
                   <span>User Profile</span>
                 </Link>
-                <Link className="dropdown-item" to="/sessions">
+                <Link className="dropdown-item" to="/sessions" onClick={closeDropdown}>
                   <i className="fas fa-desktop dropdown-icon" />
                   <span>Active Sessions</span>
                 </Link>
-                <Link className="dropdown-item" to="/settings">
+                <Link className="dropdown-item" to="/settings" onClick={closeDropdown}>
                   <i className="fas fa-sliders dropdown-icon" />
                   <span>Settings & Security</span>
                 </Link>
@@ -272,7 +304,7 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
                 <div className="dropdown-divider my-1" />
 
                 {/* Public Site Link */}
-                <Link className="dropdown-item" to="/">
+                <Link className="dropdown-item" to="/" onClick={closeDropdown}>
                   <i className="fas fa-arrow-up-right-from-square dropdown-icon text-muted" />
                   <span>Landing Page</span>
                 </Link>
@@ -285,7 +317,7 @@ const DashboardNavbar = ({ onToggleSidebar, onUnlock }) => {
                       <span>Lock Vault Now</span>
                     </button>
                   ) : (
-                    <button type="button" className="dropdown-item text-primary" onClick={onUnlock}>
+                    <button type="button" className="dropdown-item text-primary" onClick={handleUnlock}>
                       <i className="fas fa-unlock-keyhole dropdown-icon text-primary" />
                       <span>Unlock Vault</span>
                     </button>

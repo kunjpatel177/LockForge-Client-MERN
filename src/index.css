@@ -1,4 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Font Awesome 6 Brands';
+  font-display: swap;
+}
 
 :root,
 [data-theme="light"] {
@@ -621,12 +628,19 @@ a:hover {
 /* ─── Ultra-Smooth Dropdown Transition ─── */
 .navbar-pro-dropdown {
   position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: auto !important;
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
   padding: 0 !important;
   margin-top: 0.45rem !important;
   z-index: 1070;
+}
+
+.navbar-pro-dropdown.show {
+  display: block !important;
 }
 
 .navbar-dropdown-inner {

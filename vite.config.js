@@ -14,6 +14,26 @@ export default defineConfig({
     },
   },
   build: {
-    chunkSizeWarningLimit: 1200,
+    target: 'es2020',
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (
+              id.includes('react') ||
+              id.includes('react-dom') ||
+              id.includes('react-router-dom')
+            ) {
+              return 'vendor-react';
+            }
+            if (id.includes('axios') || id.includes('react-toastify')) {
+              return 'vendor-utils';
+            }
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 800,
   },
 });

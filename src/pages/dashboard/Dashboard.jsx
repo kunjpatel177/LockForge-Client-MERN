@@ -31,7 +31,7 @@ const Dashboard = () => {
         if (vaultUnlocked) {
           const [secRes, credRes] = await Promise.all([
             securityAPI.getDashboard(),
-            vaultAPI.getAll({ sort: 'updatedAt', order: 'desc' }),
+            vaultAPI.getAll({ sort: 'updatedAt', order: 'desc', limit: 5 }),
           ]);
           setSecurity(secRes.data.data);
           setRecentCreds(credRes.data.data.slice(0, 5));

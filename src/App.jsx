@@ -7,8 +7,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import PublicLayout from './components/PublicLayout';
-import DashboardLayout from './components/DashboardLayout';
 import LoadingSpinner from './components/LoadingSpinner';
+
+const DashboardLayout = lazy(() => import('./components/DashboardLayout'));
 
 // Lazy-loaded public pages for fast initial bundle loading
 const Home = lazy(() => import('./pages/public/Home'));

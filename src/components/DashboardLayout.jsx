@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import DashboardNavbar from './DashboardNavbar';
 import Sidebar from './Sidebar';
 import VaultUnlockModal from './VaultUnlockModal';
+import LoadingSpinner from './LoadingSpinner';
 import { useAuth } from '../context/AuthContext';
 
 const DashboardLayout = () => {
@@ -57,7 +58,9 @@ const DashboardLayout = () => {
               </button>
             </div>
           )}
-          <Outlet context={{ vaultUnlocked, requestUnlock: () => setShowUnlock(true) }} />
+          <Suspense fallback={<LoadingSpinner />}>
+            <Outlet context={{ vaultUnlocked, requestUnlock: () => setShowUnlock(true) }} />
+          </Suspense>
         </main>
       </div>
       <VaultUnlockModal show={showUnlock} onClose={() => setShowUnlock(false)} />

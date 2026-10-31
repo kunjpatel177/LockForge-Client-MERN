@@ -45,15 +45,19 @@ export const AuthProvider = ({ children }) => {
   }, [handleVaultLocked]);
 
   const loadSessionData = useCallback(async (checkId) => {
-    const [profileRes, vaultRes] = await Promise.all([
-      userAPI.getProfile(),
-      authAPI.vaultStatus(),
-    ]);
+    const profileRes = await userAPI.getProfile();
     if (checkId !== authCheckRef.current) return false;
 
     setUser(profileRes.data.data.user);
     setStats(profileRes.data.data.stats);
-    setVaultUnlocked(vaultRes.data.data.unlocked);
+
+    if (profileRes.data.data.unlocked !== undefined) {
+      setVaultUnlocked(profileRes.data.data.unlocked);
+    } else {
+      const vaultRes = await authAPI.vaultStatus();
+      if (checkId !== authCheckRef.current) return false;
+      setVaultUnlocked(vaultRes.data.data.unlocked);
+    }
     return true;
   }, []);
 
